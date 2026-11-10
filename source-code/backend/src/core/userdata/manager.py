@@ -312,6 +312,26 @@ def initialize_user_data(root: Optional[str] = None, adopt_existing: bool = True
     return status
 
 
+def _carry_over_settings(old_root: Path, target: Path) -> None:
+    """
+    把旧数据根的 settings.json 带到新根（仅当新根还没有）。
+
+    切换数据目录只是换位置，用户偏好不该丢：否则"不再提示"、代理、主题这类选择
+    会在换目录后全部回到默认值，表现为"我每次都设置了，下次启动又恢复"。
+    业务数据仍由 copy_current 决定是否迁移，这里只处理体积很小的配置文件。
+    """
+    source = Path(old_root) / "config" / "settings.json"
+    destination = Path(target) / "config" / "settings.json"
+    if destination.exists() or not source.exists():
+        return
+    try:
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(source, destination)
+        logger.info("[用户数据] 已继承旧目录的设置: %s", destination)
+    except OSError as exc:
+        logger.warning("[用户数据] 继承旧设置失败: %s", exc)
+
+
 def set_user_data_root(root: str, copy_current: bool = False) -> Dict[str, Any]:
     """
     更改用户数据根（写机器级指针，重启后生效）。
@@ -333,6 +353,9 @@ def set_user_data_root(root: str, copy_current: bool = False) -> Dict[str, Any]:
 
     paths.write_userdata_pointer(target)
     paths.mark_user_data_initialized(target, {"source": "pointer"})
+    # 只换位置、不复制业务数据时，仍要把用户偏好带过去，否则所有"不再提示"类
+    # 选择都会重置，用户会反复看到已经关掉的弹窗。
+    _carry_over_settings(old_root, target)
     logger.info("[用户数据] 数据目录已切换: %s（旧目录 %s），重启后生效", target, old_root)
     # 不重置解析缓存：当前进程继续使用旧目录，避免运行中读写两套路径
     status = get_userdata_status()

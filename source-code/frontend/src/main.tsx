@@ -288,6 +288,8 @@ function AppInitializer() {
       // 检查是否应该显示此提示
       if (!warnings.systemProxyDetected) {
         console.log('[AppInitializer] 系统代理检测提示已关闭')
+        // 警告配置是异步加载的，可能在弹窗已打开后才读回"已关闭"，这里一并收起
+        setShowSystemProxyDialog(false)
         return
       }
       
