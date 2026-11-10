@@ -593,6 +593,10 @@ def get_onboarding_state() -> Dict[str, Any]:
     environments = config.get("environments") or []
 
     user_root = Path(paths.get_user_data_root())
+    # 用户确认过数据目录就会写入 .initialized 标记，这是"已完成引导"的唯一可靠信号。
+    # 不能用 environments.json 判断：那个文件要等用户添加 ComfyUI 环境才创建，
+    # 拿它当条件会让用户点完"使用此目录"后每次启动仍然弹引导。
+    initialized = paths.is_user_data_initialized(user_root)
     legacy_markers = [
         user_root / "data" / "gallery" / "assets.json",
         user_root / "data" / "prompt" / "prompts.json",
@@ -611,7 +615,7 @@ def get_onboarding_state() -> Dict[str, Any]:
 
     if pointer_invalid:
         mode = "readonly_relocate"
-    elif not config_exists and not has_legacy_data:
+    elif not initialized and not config_exists and not has_legacy_data:
         mode = "new_or_import"
     else:
         mode = "normal"
@@ -627,7 +631,7 @@ def get_onboarding_state() -> Dict[str, Any]:
         "pointer_file": str(pointer_file),
         "pointer_target": pointer_target,
         "pointer_invalid": pointer_invalid,
-        "initialized": paths.is_user_data_initialized(),
+        "initialized": initialized,
         "runtime_isolated": paths.is_test_mode(),
         "message": {
             "new_or_import": "未检测到环境注册表与旧数据，请选择「新建」或「导入索引」。",

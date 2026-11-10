@@ -250,6 +250,33 @@ def test_onboarding_branches(workspace, monkeypatch, tmp_path):
     assert state_normal["mode"] == "normal"
 
 
+def test_onboarding_stops_after_user_confirms_directory(workspace, monkeypatch, tmp_path):
+    """用户点过「使用此目录」后不得再弹引导。
+
+    回归：判定曾依赖 environments.json 是否存在，而该文件要等用户添加 ComfyUI
+    环境才会创建，导致用户确认目录后每次启动仍然弹窗。
+    """
+    config_file = workspace["config_dir"] / "environments.json"
+    if config_file.exists():
+        config_file.unlink()
+
+    pointer_file = tmp_path / "pointer.txt"
+    monkeypatch.setattr(paths, "get_userdata_pointer_file", lambda: pointer_file)
+
+    # 确认前：确实需要引导
+    assert manifest_module.get_onboarding_state()["needs_onboarding"] is True
+
+    # 用户确认目录 → 只写 .initialized，此时 environments.json 仍不存在
+    paths.mark_user_data_initialized(workspace["root"])
+    assert not config_file.exists()
+
+    state = manifest_module.get_onboarding_state()
+    assert state["mode"] == "normal"
+    assert state["needs_onboarding"] is False
+    assert state["initialized"] is True
+    assert state["config_exists"] is False
+
+
 def test_cli_runtime_override_keeps_pointer_untouched(tmp_path, monkeypatch):
     """命令行覆盖只对本次进程生效；机器级指针文件内容不变。"""
     pointer_file = tmp_path / "pointer.txt"
