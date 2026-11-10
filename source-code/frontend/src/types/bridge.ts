@@ -152,10 +152,126 @@ export interface UserDataStatus {
   project_root: string
   counts: UserDataCounts
   fallback_reason?: string | null
+  runtime_dir: string
+  runtime_default: string
+  runtime_source: string
+  runtime_override?: string | null
+  runtime_note?: string | null
+  log_dir: string
+  cache_dir: string
+  webview2_dir: string
   legacy_sources: LegacyUserDataSource[]
   wipe_pending: boolean
   old_root?: string
   migration?: UserDataMigrationResult
+  error?: string
+}
+
+/** 数据范围类别 */
+export interface ScopeCategory {
+  key: string
+  label: string
+  default_mode: string
+}
+
+export interface ScopeRoot {
+  id: string
+  name: string
+  path: string
+  package_id?: string
+  data_space_id?: string
+}
+
+export interface ScopeValue {
+  mode: 'global' | 'private' | 'custom' | 'legacy' | string
+  space_id: string
+  path: string
+  source: string
+  exists: boolean
+  epoch: number
+}
+
+export interface ScopeDataSpace {
+  id: string
+  name: string
+  path: string
+  layout: string
+  package_id?: string
+  is_global?: boolean
+}
+
+export interface ScopeMatrix {
+  success: boolean
+  categories: ScopeCategory[]
+  roots: ScopeRoot[]
+  packages: Array<{ id: string; name: string; is_default?: boolean; global_space_id?: string }>
+  data_spaces: ScopeDataSpace[]
+  values: Record<string, Record<string, ScopeValue>>
+  current_environment_id?: string | null
+  current_package_id?: string | null
+  non_switchable: Array<{ key: string; label: string; reason: string }>
+  error?: string
+}
+
+export interface ScopePreview {
+  success: boolean
+  category: string
+  mode: string
+  current: { mode: string; path: string; items: number | null }
+  target: { space_id?: string; path: string; exists: boolean; items: number | null }
+  auto_migration: boolean
+  message: string
+  error?: string
+}
+
+export interface ManifestPreviewItem {
+  kind: 'space' | 'root' | string
+  id: string
+  name?: string
+  path: string
+  status: 'ok' | 'missing' | 'conflict' | string
+  reason?: string
+  counts?: Record<string, { exists?: boolean; items?: number }>
+}
+
+export interface ManifestPreview {
+  success: boolean
+  validation?: { valid: boolean; errors: string[]; warnings: string[] }
+  items?: ManifestPreviewItem[]
+  summary?: Record<string, number>
+  packages?: unknown[]
+  secrets_included?: boolean
+  message?: string
+  error?: string
+}
+
+export interface ManifestImportResult {
+  success: boolean
+  applied?: { packages: number; data_spaces: number; roots: number; skipped: number }
+  skipped?: number
+  backup_dir?: string
+  pointer_changed?: boolean
+  pointer_note?: string
+  preview?: ManifestPreview
+  rolled_back?: boolean
+  message?: string
+  error?: string
+}
+
+export interface OnboardingState {
+  success: boolean
+  mode: 'normal' | 'new_or_import' | 'readonly_relocate' | string
+  needs_onboarding: boolean
+  config_exists: boolean
+  environment_count: number
+  has_legacy_data: boolean
+  userdata_root: string
+  pointer_file: string
+  pointer_target: string | null
+  pointer_invalid: boolean
+  initialized: boolean
+  runtime_isolated: boolean
+  message: string
   error?: string
 }
 
@@ -2152,6 +2268,17 @@ export interface PyWebViewAPI {
 
   userdata_set_root: (root: string, copyCurrent?: boolean) => Promise<UserDataStatus>;
 
+  userdata_set_runtime_dir: (
+    path?: string | null
+  ) => Promise<{
+    success: boolean
+    error?: string
+    runtime_dir?: string
+    runtime_source?: string
+    runtime_note?: string | null
+    restart_required?: boolean
+  }>;
+
   userdata_inspect_root: (path: string) => Promise<UserDataRootInspection>;
 
   userdata_start_migration: (
@@ -2170,6 +2297,47 @@ export interface PyWebViewAPI {
   userdata_restart_app: () => Promise<{ success: boolean; message?: string }>;
 
   userdata_open_folder: (path?: string | null) => Promise<{ success: boolean; path?: string; error?: string }>;
+
+  // ========== 数据范围开关（scopeMap） ==========
+
+  scope_get_matrix: () => Promise<ScopeMatrix>;
+
+  scope_preview_change: (
+    category: string,
+    mode: string,
+    rootId?: string | null,
+    spaceId?: string | null
+  ) => Promise<ScopePreview>;
+
+  scope_set: (
+    category: string,
+    mode: string,
+    rootId?: string | null,
+    spaceId?: string | null
+  ) => Promise<{ success: boolean; resolved?: ScopeValue; matrix?: ScopeMatrix; note?: string; error?: string }>;
+
+  scope_get_epoch: (
+    category?: string | null,
+    rootId?: string | null
+  ) => Promise<{ success: boolean; epoch?: number; epochs?: Record<string, number>; error?: string }>;
+
+  // ========== 索引文件（manifest）与首启引导 ==========
+
+  manifest_export: () => Promise<{
+    success: boolean
+    manifest?: Record<string, unknown>
+    json?: string
+    suggested_filename?: string
+    error?: string
+  }>;
+
+  manifest_preview_import: (content: string) => Promise<ManifestPreview>;
+
+  manifest_import: (content: string, options?: Record<string, unknown>) => Promise<ManifestImportResult>;
+
+  onboarding_get_state: () => Promise<OnboardingState>;
+
+  onboarding_relocate: (root: string) => Promise<{ success: boolean; onboarding?: OnboardingState; error?: string }>;
 }
 
 // 扩展 Window 接口

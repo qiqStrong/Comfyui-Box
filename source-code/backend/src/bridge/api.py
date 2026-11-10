@@ -3,6 +3,7 @@ API 类
 用于暴露给前端的所有 API
 """
 
+import json
 import time
 import threading
 from typing import Dict, Optional
@@ -2461,6 +2462,11 @@ class Api:
         Returns:
             dict: {success, path, backup_path, error_message}
         """
+        from backend.src.utils.test_isolation import guard_write
+
+        error = guard_write("写入 extra_model_paths.yaml")
+        if error:
+            return {"success": False, "error_message": error}
         try:
             import shutil
             from datetime import datetime
@@ -7844,6 +7850,160 @@ class Api:
             logger.error("[用户数据] 初始化失败: %s", exc, exc_info=True)
             return {"success": False, "error": str(exc)}
 
+    # ========== 数据范围开关 API（scopeMap） ==========
+
+    def scope_get_matrix(self) -> dict:
+        """获取设置页统一矩阵：数据类别 × 环境根，含当前绑定与物理路径。"""
+        from backend.src.core.scope import get_scope_matrix
+        try:
+            return get_scope_matrix()
+        except Exception as exc:
+            logger.error("[scope] 获取矩阵失败: %s", exc, exc_info=True)
+            return {"success": False, "error": str(exc)}
+
+    def scope_preview_change(
+        self, category: str, mode: str, root_id: str = None, space_id: str = None
+    ) -> dict:
+        """切换前影响面预览（不落盘、不迁移）。"""
+        from backend.src.core.scope import preview_scope_change
+        try:
+            return preview_scope_change(category, mode, root_id=root_id, space_id=space_id)
+        except Exception as exc:
+            return {"success": False, "error": str(exc)}
+
+    def scope_set(self, category: str, mode: str, root_id: str = None, space_id: str = None) -> dict:
+        """
+        设置某类数据在指定根上的 scope 绑定。
+
+        只写注册表并递增 scopeEpoch；不迁移数据。随后刷新依赖路径的缓存。
+        """
+        from backend.src.core.scope import set_scope
+        try:
+            resolved = set_scope(category, mode, root_id=root_id, space_id=space_id)
+        except ValueError as exc:
+            return {"success": False, "error": str(exc)}
+        except Exception as exc:
+            logger.error("[scope] 设置失败: %s", exc, exc_info=True)
+            return {"success": False, "error": str(exc)}
+
+        self._invalidate_scope_caches()
+        return {
+            "success": True,
+            "resolved": resolved,
+            "matrix": self.scope_get_matrix(),
+            "note": "已切换读取路径，未迁移任何旧数据；原目录内容保持原位。",
+        }
+
+    def _invalidate_scope_caches(self) -> None:
+        """scope 变化后失效所有依赖路径的内存缓存。"""
+        from backend.src.utils.logger import app_logger as logger_
+
+        try:
+            from backend.src.gallery.storage import gallery_storage
+            from backend.src.gallery.scanner import gallery_scanner
+
+            gallery_storage.reset_scope()
+            gallery_scanner.reset_scope()
+        except Exception as exc:
+            logger_.warning("[scope] 重置资产库缓存失败: %s", exc)
+        try:
+            self._gallery_controller.reset_scope()
+        except Exception as exc:
+            logger_.warning("[scope] 重置资产库控制器失败: %s", exc)
+        try:
+            self._prompt_library_controller.refresh_scope()
+        except Exception as exc:
+            logger_.warning("[scope] 重置提示词库缓存失败: %s", exc)
+        try:
+            self._workflow_controller.reset_initialization()
+        except Exception as exc:
+            logger_.warning("[scope] 重置工作流缓存失败: %s", exc)
+        try:
+            from backend.src.core.ai.database import refresh_scope
+
+            refresh_scope()
+        except Exception as exc:
+            logger_.warning("[scope] 刷新 AI 数据库路径失败: %s", exc)
+
+    def scope_get_epoch(self, category: str = None, root_id: str = None) -> dict:
+        """查询 scope 版本号（前端用于缓存失效判断）。"""
+        from backend.src.core.scope import CATEGORY_SPECS, get_scope_epoch
+        try:
+            if category:
+                return {"success": True, "category": category, "epoch": get_scope_epoch(category, root_id)}
+            return {
+                "success": True,
+                "epochs": {key: get_scope_epoch(key, root_id) for key in CATEGORY_SPECS},
+            }
+        except Exception as exc:
+            return {"success": False, "error": str(exc)}
+
+    # ========== 索引文件（manifest）与首启引导 API ==========
+
+    def manifest_export(self) -> dict:
+        """导出索引快照（不含密钥/API Key/环境变量值）。"""
+        from backend.src.core.manifest import export_manifest
+        try:
+            manifest = export_manifest()
+            return {
+                "success": True,
+                "manifest": manifest,
+                "json": json.dumps(manifest, ensure_ascii=False, indent=2),
+                "suggested_filename": f"comfyui-box-manifest-{manifest.get('app_version', 'unknown')}.json",
+            }
+        except Exception as exc:
+            logger.error("[manifest] 导出失败: %s", exc, exc_info=True)
+            return {"success": False, "error": str(exc)}
+
+    def manifest_preview_import(self, content: str) -> dict:
+        """导入前校验与影响预览。"""
+        from backend.src.core.manifest import preview_import
+        try:
+            data = json.loads(content) if isinstance(content, str) else content
+            return preview_import(data)
+        except ValueError as exc:
+            return {"success": False, "error": f"JSON 解析失败: {exc}"}
+        except Exception as exc:
+            logger.error("[manifest] 预览失败: %s", exc, exc_info=True)
+            return {"success": False, "error": str(exc)}
+
+    def manifest_import(self, content: str, options: dict = None) -> dict:
+        """
+        导入索引：校验 → 预览 → 备份 → 原子应用 → 失败回滚。
+
+        options: overwrite / update_pointer / selected_space_ids / selected_root_ids / selected_package_ids
+        """
+        from backend.src.core.manifest import import_manifest
+        try:
+            data = json.loads(content) if isinstance(content, str) else content
+            return import_manifest(data, options or {})
+        except ValueError as exc:
+            return {"success": False, "error": f"JSON 解析失败: {exc}"}
+        except Exception as exc:
+            logger.error("[manifest] 导入失败: %s", exc, exc_info=True)
+            return {"success": False, "error": str(exc)}
+
+    def onboarding_get_state(self) -> dict:
+        """首启/指针失效状态。"""
+        from backend.src.core.manifest import get_onboarding_state
+        try:
+            return get_onboarding_state()
+        except Exception as exc:
+            return {"success": False, "error": str(exc)}
+
+    def onboarding_relocate(self, root: str) -> dict:
+        """指针失效时重新定位用户数据根（不复制、不删除数据）。"""
+        from backend.src.core.userdata import set_user_data_root
+        try:
+            result = set_user_data_root(root, copy_current=False)
+            result["onboarding"] = self.onboarding_get_state()
+            return result
+        except ValueError as exc:
+            return {"success": False, "error": str(exc)}
+        except Exception as exc:
+            logger.error("[onboarding] 重新定位失败: %s", exc, exc_info=True)
+            return {"success": False, "error": str(exc)}
+
     def userdata_set_root(self, root: str, copy_current: bool = False) -> dict:
         """更改用户数据目录（写机器级指针；可选复制当前数据）。"""
         from backend.src.core.userdata import set_user_data_root
@@ -7853,6 +8013,22 @@ class Api:
             return {"success": False, "error": str(exc)}
         except Exception as exc:
             logger.error("[用户数据] 更改目录失败: %s", exc, exc_info=True)
+            return {"success": False, "error": str(exc)}
+
+    def userdata_set_runtime_dir(self, path: str = "") -> dict:
+        """
+        设置运行数据目录（日志/缓存/WebView2 的父目录），重启后生效。
+
+        Args:
+            path: 绝对路径；空字符串恢复默认（项目相对路径）
+        """
+        from backend.src.core.userdata import set_runtime_data_root
+        try:
+            return set_runtime_data_root(path)
+        except ValueError as exc:
+            return {"success": False, "error": str(exc)}
+        except Exception as exc:
+            logger.error("[用户数据] 更改运行数据目录失败: %s", exc, exc_info=True)
             return {"success": False, "error": str(exc)}
 
     def userdata_inspect_root(self, path: str) -> dict:

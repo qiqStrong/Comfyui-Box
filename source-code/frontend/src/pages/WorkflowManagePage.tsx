@@ -6,6 +6,7 @@ import { useState, useCallback, useEffect, useMemo, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Upload, Search, Loader2, FolderOpen, CheckSquare, FolderSync, Cog, LayoutGrid, LayoutList } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { ScopeBadge } from '@/components/common/ScopeBadge'
 import { Button } from '@/components/ui'
 import { Input } from '@/components/ui/Input'
 import {
@@ -346,6 +347,7 @@ function WorkflowManagePageInner() {
             />
           </div>
           <div className="flex items-center gap-3">
+            <ScopeBadge category="workflows" />
             <div className="flex items-center gap-0.5 rounded-md border border-border-subtle bg-surface-active p-0.5">
               <Button
                 variant="ghost"

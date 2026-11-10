@@ -12,7 +12,7 @@ from datetime import datetime
 from typing import Optional
 
 from backend.src.utils.logger import app_logger as logger
-from backend.src.utils.paths import get_data_dir
+from backend.src.utils.paths import get_scope_category_dir
 from .models import Asset, AssetCategory, ScanProgress
 from .storage import gallery_storage
 
@@ -31,7 +31,15 @@ class GalleryScanner:
 
     def __init__(self):
         self._cancelled = False
-        self._thumbnails_dir = get_data_dir() / "gallery" / "thumbnails"
+        self._refresh_paths()
+
+    def _refresh_paths(self) -> None:
+        """按当前 scope 绑定重新计算缩略图目录。"""
+        self._thumbnails_dir = get_scope_category_dir("gallery", "thumbnails")
+
+    def reset_scope(self) -> None:
+        """scope 变化后重算路径。"""
+        self._refresh_paths()
 
     @classmethod
     def is_scanning(cls) -> bool:

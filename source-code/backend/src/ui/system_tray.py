@@ -16,7 +16,7 @@ from pathlib import Path
 from typing import Callable, Optional
 
 from backend.src.utils.logger import app_logger as logger
-from backend.src.utils.paths import get_internal_dir
+from backend.src.utils.paths import get_resource_logo_dir
 
 
 class SystemTrayManager:
@@ -75,9 +75,7 @@ class SystemTrayManager:
         try:
             from PIL import Image
 
-            icon_path = get_internal_dir() / 'assets' / 'icon.png'
-            if not icon_path.exists():
-                icon_path = Path(__file__).parent.parent.parent.parent / 'assets' / 'icon.png'
+            icon_path = get_resource_logo_dir() / 'icon.png'
 
             if icon_path.exists():
                 self._icon = Image.open(icon_path)

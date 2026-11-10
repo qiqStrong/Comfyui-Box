@@ -18,6 +18,7 @@ import { LoraSelectionBox } from '@/components/lora/LoraSelectionBox'
 import { LoraBatchToolbar } from '@/components/lora/LoraBatchToolbar'
 import { bridgeService, type LoraModel } from '@/services/bridge'
 import { cn } from '@/lib/utils'
+import { ScopeBadge } from '@/components/common/ScopeBadge'
 
 export default function LoraManagePage() {
   const { t } = useTranslation()
@@ -556,6 +557,7 @@ export default function LoraManagePage() {
             />
           </div>
           <div className="flex items-center gap-3">
+            <ScopeBadge category="lora" />
             <Button 
               variant="outline" 
               className="flex items-center gap-0 px-3"

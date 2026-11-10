@@ -21,7 +21,7 @@ pytestmark = pytest.mark.skipif(
     sys.platform != "win32", reason="仅在 Windows 上有意义"
 )
 
-PROJECT_ICO = _SOURCE_ROOT / "icon.ico"
+PROJECT_ICO = _SOURCE_ROOT / "resource" / "img" / "logo" / "icon.ico"
 
 
 def test_设置AppUserModelID成功且可重复调用():
@@ -48,7 +48,7 @@ def test_未找到窗口时返回False():
 
 
 def test_能加载项目自带ico():
-    assert PROJECT_ICO.is_file(), "项目根目录应存在 icon.ico"
+    assert PROJECT_ICO.is_file(), "随包资源目录应存在 resource/img/logo/icon.ico"
     handle = window_icon._load_icon(PROJECT_ICO, 32)
     assert handle != 0, "LoadImageW 应能从 icon.ico 加载出图标句柄"
 

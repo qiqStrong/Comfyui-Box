@@ -907,7 +907,13 @@ class DependencyController:
         try:
             from datetime import datetime
             import sys
-            
+
+            from backend.src.utils.test_isolation import guard_write
+
+            error = guard_write("安装 PyTorch")
+            if error:
+                return {"success": False, "error_message": error}
+
             logger.info(f"[DependencyController] 安装 PyTorch {version}, CUDA: {cuda_version}, 镜像源: {mirror_source}")
             
             # 获取当前环境
@@ -1371,7 +1377,13 @@ class DependencyController:
         try:
             from datetime import datetime
             import sys
-            
+
+            from backend.src.utils.test_isolation import guard_write
+
+            error = guard_write("安装依赖包")
+            if error:
+                return {"success": False, "error_message": error}
+
             logger.info(f"[DependencyController] 安装包: {package_name}=={version}, 模式: {mode}, 镜像源: {mirror_source}")
             
             if not _validate_package_name(package_name):
@@ -1501,7 +1513,13 @@ class DependencyController:
         try:
             from datetime import datetime
             import sys
-            
+
+            from backend.src.utils.test_isolation import guard_write
+
+            error = guard_write("卸载依赖包")
+            if error:
+                return {"success": False, "error_message": error}
+
             logger.info(f"[DependencyController] 卸载包: {package_name}")
             
             if not _validate_package_name(package_name):
@@ -1612,7 +1630,13 @@ class DependencyController:
         try:
             from datetime import datetime
             import sys
-            
+
+            from backend.src.utils.test_isolation import guard_write
+
+            error = guard_write("从 requirements.txt 安装依赖")
+            if error:
+                return {"success": False, "error_message": error}
+
             logger.info(f"[DependencyController] 从 requirements.txt 安装: {file_path}, 模式: {mode}, 镜像源: {mirror_source}")
             
             is_valid, error_msg = _validate_file_path(file_path)
@@ -2402,7 +2426,13 @@ class DependencyController:
         try:
             from datetime import datetime
             import sys
-            
+
+            from backend.src.utils.test_isolation import guard_write
+
+            error = guard_write("安装 whl 文件")
+            if error:
+                return {"success": False, "error_message": error}
+
             logger.info(f"[DependencyController] 安装 whl 文件: {file_path}")
             
             # 检查文件是否存在

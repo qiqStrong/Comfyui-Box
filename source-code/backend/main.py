@@ -384,13 +384,46 @@ def migrate_from_internal(logger):
         logger.warning(f"[迁移] 迁移过程出错: {e}")
 
 
+def _apply_runtime_overrides() -> None:
+    """
+    解析并应用仅本次启动生效的命令行覆盖。
+
+    --user-data-dir <path>  使用测试数据根（不修改机器级 userdata.location 指针）
+    --instance-name <name>  使用独立单实例锁名，允许测试实例与发布版并存
+    --test-mode             强制开启只读保护（对真实 ComfyUI 根的写操作显式拒绝）
+    """
+    import argparse
+
+    parser = argparse.ArgumentParser(add_help=False)
+    parser.add_argument("--user-data-dir", dest="user_data_dir", default=None)
+    parser.add_argument("--instance-name", dest="instance_name", default=None)
+    parser.add_argument("--test-mode", dest="test_mode", action="store_true")
+    args, _unknown = parser.parse_known_args()
+
+    if args.user_data_dir or args.instance_name or args.test_mode:
+        from backend.src.utils.paths import configure_runtime_overrides
+
+        configure_runtime_overrides(
+            user_data_dir=args.user_data_dir,
+            instance_name=args.instance_name,
+            test_mode=args.test_mode or None,
+        )
+        safe_print(
+            f"[启动] 测试隔离模式: user_data_dir={args.user_data_dir or '(默认)'}, "
+            f"instance_name={args.instance_name or '(默认)'}, readonly={args.test_mode}"
+        )
+
+
 def main():
+    _apply_runtime_overrides()
+
     instance_manager = None
     
     if sys.platform == "win32":
         from backend.src.utils.single_instance import ensure_single_instance
-        
-        is_first, instance_manager = ensure_single_instance("Comfyui-Box")
+        from backend.src.utils.paths import get_runtime_instance_name
+
+        is_first, instance_manager = ensure_single_instance(get_runtime_instance_name("Comfyui-Box"))
         
         if not is_first:
             safe_print("=" * 60)
@@ -463,6 +496,8 @@ def main():
             cmd = [sys.executable]
             if not getattr(sys, 'frozen', False):
                 cmd.append(__file__)
+            # 保留本次启动的隔离参数，避免 Git 引导重启后退回生产数据根
+            cmd.extend(sys.argv[1:])
             os.environ['COMFYUI_BOX_BOOTSTRAP_COMPLETED'] = '1'
             flags = _bootstrap_sp.CREATE_NO_WINDOW if hasattr(_bootstrap_sp, 'CREATE_NO_WINDOW') else 0
             _bootstrap_sp.Popen(cmd, creationflags=flags)
@@ -532,6 +567,12 @@ def main():
         from backend.src.utils import paths as _paths
         logger.info(f"用户数据根: {_paths.get_user_data_root()}（来源: {_paths.get_user_data_source()}）")
         logger.info(f"安装根目录（系统级）: {_paths.get_project_root()}")
+        logger.info(f"运行数据根: {_paths.resolve_runtime_dir()[0]}（来源: {_paths.get_runtime_data_source()}）")
+        logger.info(f"日志目录: {_paths.get_log_dir()}；缓存目录: {_paths.get_cache_dir()}")
+        _runtime_note = _paths.get_runtime_data_resolution_note()
+        if _runtime_note:
+            logger.warning(f"[运行数据] {_runtime_note}")
+            safe_print(f"[警告] {_runtime_note}")
         
         # 记录 Git 环境配置
         git_exe = _git_manager.get_git_executable()
@@ -558,9 +599,9 @@ def main():
         logger.info("安全模式已启用，GPU 禁用参数已通过源码 patch 注入")
     
     # 配置 WebView2 用户数据文件夹（用于保存下载路径等偏好设置）
-    # 使用 %LOCALAPPDATA%\Comfyui-Box\webview2 避免非 ASCII 路径导致的问题
-    # （如桌面路径含中文时 WebView2 初始化异常）
-    # %LOCALAPPDATA% 不需要管理员权限，不会被磁盘清理工具删除
+    # 项目相对路径：发布版为 <安装根>\webview2，源码版为 source-code\webview2。
+    # WebView2 只接受绝对路径，get_webview2_dir() 已 resolve；安装目录不可写时
+    # 运行数据根会降级到临时目录并在设置页告警，可在设置页改“运行数据目录”。
     from backend.src.utils.paths import get_webview2_dir
     user_data_dir = get_webview2_dir()
     user_data_dir.mkdir(parents=True, exist_ok=True)
@@ -1304,17 +1345,15 @@ def main():
     safe_print("[主窗口] 正在启动 WebView2，请稍候...")
 
     # 窗口图标：未指定时 pywebview 会从 sys.executable 提取，
-    # 开发模式下即为 python.exe 的图标，故显式传入项目自带的 .ico
-    _icon_path = base_path / "icon.ico"
-    # PyInstaller onedir 模式图标在 _internal/ 下；onefile 模式在 _MEIPASS 下
-    if getattr(sys, 'frozen', False) and not _icon_path.exists():
-        _frozen_base = Path(sys._MEIPASS) if hasattr(sys, '_MEIPASS') else base_path / "_internal"
-        _alt_icon = _frozen_base / "icon.ico"
-        if _alt_icon.exists():
-            _icon_path = _alt_icon
+    # 开发模式下即为 python.exe 的图标，故显式传入随包资源里的 .ico
+    from backend.src.utils.paths import get_resource_logo_dir
+
+    _icon_path = get_resource_logo_dir() / "icon.ico"
     _icon_arg = str(_icon_path) if _icon_path.exists() else None
     if _icon_arg:
         logger.info(f"[主窗口] 使用窗口图标: {_icon_arg}")
+    else:
+        logger.warning(f"[主窗口] 未找到窗口图标: {_icon_path}")
 
     webview.start(
         func=on_webview_ready,

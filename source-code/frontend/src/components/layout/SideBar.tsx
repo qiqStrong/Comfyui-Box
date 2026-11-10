@@ -383,7 +383,7 @@ export function SideBar() {
         >
           <div className="size-8 shrink-0 overflow-hidden rounded-lg">
             <img 
-              src="/app-icon.png" 
+              src="/logo/app-icon.png" 
               alt="Comfyui-Box" 
               className="size-full object-cover"
             />

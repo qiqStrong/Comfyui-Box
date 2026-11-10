@@ -299,7 +299,13 @@ class VersionController:
             dict: 切换结果
         """
         original_commit = None
-        
+
+        from backend.src.utils.test_isolation import guard_write
+
+        error = guard_write("切换 ComfyUI 版本")
+        if error:
+            return {"success": False, "needDependencyUpdate": False, "message": error}
+
         try:
             logger.info(f"[VersionController] 开始切换版本: {version_id} ({version_type}), force={force}")
             self._init_managers()
@@ -426,6 +432,12 @@ class VersionController:
         Returns:
             dict: 更新结果
         """
+        from backend.src.utils.test_isolation import guard_write
+
+        error = guard_write("更新 ComfyUI 依赖")
+        if error:
+            return {"success": False, "message": error}
+
         try:
             self._init_managers()
             
@@ -492,6 +504,12 @@ class VersionController:
         Returns:
             dict: 更新结果
         """
+        from backend.src.utils.test_isolation import guard_write
+
+        error = guard_write("修改 ComfyUI 远程仓库地址")
+        if error:
+            return {"success": False, "message": error}
+
         try:
             self._init_managers()
             
@@ -618,6 +636,12 @@ class VersionController:
                 "message": str
             }
         """
+        from backend.src.utils.test_isolation import guard_write
+
+        error = guard_write("切换 ComfyUI 分支")
+        if error:
+            return {"success": False, "message": error}
+
         try:
             self._init_managers()
             

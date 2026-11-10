@@ -72,7 +72,9 @@ class EnvironmentConfigManager(ConfigMigrator):
         
         self._config_cache: Optional[Dict] = None
         self._cache_mtime: Optional[float] = None
-        self._cache_lock = threading.Lock()
+        # 父类 load_config 在补全缺失字段/迁移时会回调 self.save_config，
+        # 同一线程内需要可重入，避免自锁死。
+        self._cache_lock = threading.RLock()
     
     def get_default_config(self) -> Dict:
         """
@@ -84,7 +86,11 @@ class EnvironmentConfigManager(ConfigMigrator):
         return {
             "version": self.CURRENT_VERSION,
             "environments": [],
-            "current_environment_id": None
+            "current_environment_id": None,
+            # 多包 / 数据空间注册表（旧配置读取时自动补全）
+            "packages": [],
+            "data_spaces": [],
+            "current_package_id": None,
         }
     
     # 为了向后兼容，保留原有的属性访问器（返回字符串）
@@ -138,6 +144,8 @@ class EnvironmentConfigManager(ConfigMigrator):
         Returns:
             Dictionary with configuration data
         """
+        needs_persist = False
+        config: Dict
         with self._cache_lock:
             try:
                 if not self.config_file.exists():
@@ -151,15 +159,31 @@ class EnvironmentConfigManager(ConfigMigrator):
                 
                 logger.debug(f"[EnvironmentConfigManager.load_config] 从文件加载配置: {self.config_file}")
                 config = super().load_config()
-                
+
+                # 旧配置兼容：补全 packages / data_spaces / 环境绑定字段。
+                # 读取本身永不因缺字段报错；回写放到释放锁之后，避免重复加锁。
+                try:
+                    from ..scope import normalize_registry
+                    needs_persist = normalize_registry(config)
+                except Exception as exc:
+                    logger.warning(f"[EnvironmentConfigManager.load_config] 注册表补全失败（忽略）：{exc}")
+
                 self._config_cache = config
-                self._cache_mtime = current_mtime
+                self._cache_mtime = os.path.getmtime(self.config_file)
                 
                 logger.debug(f"[EnvironmentConfigManager.load_config] 配置文件加载成功，包含 {len(config.get('environments', []))} 个环境")
-                return config
             except Exception as e:
                 logger.error(f"[EnvironmentConfigManager] 配置文件加载失败：{str(e)}")
                 return self.get_default_config()
+
+        if needs_persist:
+            try:
+                self.save_config(config)
+                logger.info("[EnvironmentConfigManager.load_config] 已补全多包/数据空间注册表字段")
+            except Exception as exc:
+                logger.warning(f"[EnvironmentConfigManager.load_config] 注册表回写失败（忽略）：{exc}")
+
+        return config
     
     def save_config(self, config: Dict) -> bool:
         """
@@ -175,7 +199,13 @@ class EnvironmentConfigManager(ConfigMigrator):
         with self._cache_lock:
             try:
                 logger.debug(f"[EnvironmentConfigManager] 开始保存配置，包含 {len(config.get('environments', []))} 个环境")
-                
+
+                try:
+                    from ..scope import normalize_registry
+                    normalize_registry(config)
+                except Exception as exc:
+                    logger.warning(f"[EnvironmentConfigManager] 保存前注册表补全失败（忽略）：{exc}")
+
                 success = super().save_config(config)
                 
                 if success:

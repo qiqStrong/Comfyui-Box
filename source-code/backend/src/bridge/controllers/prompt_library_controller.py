@@ -27,6 +27,10 @@ class PromptLibraryController:
         """初始化控制器"""
         self.service = PromptLibraryService()
         logger.info("提示词库控制器初始化完成")
+
+    def refresh_scope(self) -> None:
+        """scope 切换后重新解析数据路径。"""
+        self.service.refresh_scope()
     
     # ==================== 提示词 API ====================
     

@@ -1,20 +1,20 @@
 """一键替换应用图标
 
 用法：
-    python scripts/set_app_icon.py                          # 用默认的 v4 设计重新生成
-    python scripts/set_app_icon.py assets/icons/xxx.png     # 换成指定图片
+    python scripts/set_app_icon.py                              # 用默认的 v4 设计重新生成
+    python scripts/set_app_icon.py resource/img/icons/app/x.png # 换成指定图片
     python scripts/set_app_icon.py D:/design/new.png --no-transparent
 
-生成四份产物：
-    source-code/icon.ico                     窗口图标 + PyInstaller 打包图标
-    source-code/assets/icon.png              系统托盘图标
-    source-code/frontend/public/favicon.ico  浏览器标签页图标
-    source-code/frontend/public/app-icon.png 侧边栏与关于页的 logo
+生成四份产物，全部落在 resource/img/logo/（随包只读资源，唯一来源）：
+    resource/img/logo/icon.ico      窗口图标 + PyInstaller 打包图标
+    resource/img/logo/icon.png      系统托盘图标
+    resource/img/logo/favicon.ico   浏览器标签页图标
+    resource/img/logo/app-icon.png  侧边栏、关于页、更新器的 logo
 
 默认会把纯白背景抠成透明（`--no-transparent` 可关闭）。AI 出图的图标基本都是
 不透明白底，不抠的话任务栏上会显示成一个白方块。
 
-若换了新设计并希望长期使用，把图片放进 assets/icons/ 并在此处改 DEFAULT_SOURCE。
+若换了新设计并希望长期使用，把图片放进 resource/img/icons/app/ 并改 DEFAULT_SOURCE。
 """
 
 import argparse
@@ -26,11 +26,12 @@ sys.path.insert(0, str(SOURCE_ROOT))
 
 from backend.src.utils.icon_builder import build_app_icons, describe_ico  # noqa: E402
 
-DEFAULT_SOURCE = SOURCE_ROOT / "assets" / "icons" / "comfyui-box-v4.png"
-ICO_PATH = SOURCE_ROOT / "icon.ico"
-PNG_PATH = SOURCE_ROOT / "assets" / "icon.png"
-FAVICON_PATH = SOURCE_ROOT / "frontend" / "public" / "favicon.ico"
-APP_ICON_PATH = SOURCE_ROOT / "frontend" / "public" / "app-icon.png"
+RESOURCE_LOGO_DIR = SOURCE_ROOT / "resource" / "img" / "logo"
+DEFAULT_SOURCE = SOURCE_ROOT / "resource" / "img" / "icons" / "app" / "comfyui-box-v4.png"
+ICO_PATH = RESOURCE_LOGO_DIR / "icon.ico"
+PNG_PATH = RESOURCE_LOGO_DIR / "icon.png"
+FAVICON_PATH = RESOURCE_LOGO_DIR / "favicon.ico"
+APP_ICON_PATH = RESOURCE_LOGO_DIR / "app-icon.png"
 
 
 def main() -> int:

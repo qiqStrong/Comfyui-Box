@@ -8,11 +8,32 @@ import sqlite3
 from pathlib import Path
 from typing import Optional
 from contextlib import contextmanager
-from backend.src.utils.paths import get_data_dir
+from backend.src.utils.paths import get_data_dir, get_scope_category_file
 
 
-# 数据库文件路径（使用绝对路径，避免工作目录问题）
+def get_db_path() -> Path:
+    """
+    返回当前 AI 对话数据库路径。
+
+    默认沿用 ``DB_PATH``（导入期不再解析 scope，避免读配置/补全注册表的副作用）；
+    应用启动与 scope 切换时由 ``refresh_scope()`` 依据绑定关系刷新。
+    """
+    return DB_PATH
+
+
+# 兼容旧代码的常量，也是当前实际使用的数据库路径（scope 切换时由 refresh_scope 更新）
 DB_PATH = get_data_dir() / "ai_assistant.db"
+
+
+def refresh_scope() -> Path:
+    """按当前 scope 绑定重新计算数据库路径（供启动与切换后调用）。"""
+    global DB_PATH
+    try:
+        DB_PATH = Path(get_scope_category_file("ai"))
+    except Exception:
+        pass
+    return DB_PATH
+
 
 
 def init_database() -> None:
@@ -28,9 +49,10 @@ def init_database() -> None:
     数据库初始化后会自动执行配置迁移（如果需要）。
     """
     # 确保 data 目录存在
-    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
-    
-    conn = sqlite3.connect(DB_PATH)
+    db_path = get_db_path()
+    db_path.parent.mkdir(parents=True, exist_ok=True)
+
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     
     try:
@@ -139,7 +161,7 @@ def get_db_connection():
     Yields:
         sqlite3.Connection: 数据库连接对象
     """
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(get_db_path())
     # 启用外键约束
     conn.execute("PRAGMA foreign_keys = ON")
     # 设置 Row 工厂，使查询结果可以通过列名访问
@@ -230,7 +252,7 @@ def _run_schema_migrations() -> None:
         from backend.src.core.ai.migrations import run_all_migrations
         
         logger.info("开始执行数据库 schema 迁移...")
-        success = run_all_migrations(DB_PATH)
+        success = run_all_migrations(get_db_path())
         
         if success:
             logger.info("数据库 schema 迁移成功完成")

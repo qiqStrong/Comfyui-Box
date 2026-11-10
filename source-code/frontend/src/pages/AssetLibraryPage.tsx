@@ -28,6 +28,7 @@ import { useChromeStore } from '@/stores/useChromeStore'
 import { useFullscreenStore } from '@/stores/useFullscreenStore'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
+import { ScopeBadge } from '@/components/common/ScopeBadge'
 import type { Asset } from '@/mocks/asset'
 import type { AssetMasonryGridRef } from '@/components/asset'
 import type { AssetCategory } from '@/mocks/asset'
@@ -425,6 +426,11 @@ export default function AssetLibraryPage() {
             onOpenSettings={() => setShowSettings(true)}
             hideLayoutControls={!!theaterAsset}
           />
+        )}
+        {!chromeHidden.filter && (
+          <div className="flex shrink-0 items-center justify-end border-b border-border-subtle bg-surface px-4 py-1">
+            <ScopeBadge category="gallery" />
+          </div>
         )}
 
         {/* 横向用 clip、纵向用 hidden：clip 不产生滚动容器，轨道列表定位时的滚动才不会顺带把

@@ -24,6 +24,7 @@ import { ConfirmDialog } from '@/components/common/ConfirmDialog'
 import { Button } from '@/components/ui/Button'
 import type { PromptGridRef } from '@/components/prompt/PromptGrid'
 import { cn } from '@/lib/utils'
+import { ScopeBadge } from '@/components/common/ScopeBadge'
 import {
   usePromptStore,
   type Prompt,
@@ -502,6 +503,7 @@ export default function PromptManagePage() {
                 {t('prompt.toolbar.totalPrompts', { count: filteredPrompts.length })}
               </span>
               <div className="flex items-center gap-0.5">
+                <ScopeBadge category="prompts" className="mr-1" />
                 <Button
                   type="button"
                   variant="ghost"

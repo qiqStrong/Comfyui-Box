@@ -35,7 +35,12 @@ DIRECTORIES = [
     "frontend/src/utils",
     "frontend/src/types",
     "frontend/src/styles",
-    "frontend/public",
+    "resource/img/logo",
+    "resource/img/icons",
+    "resource/img/qr",
+    "resource/img/avatars",
+    "resource/models",
+    "resource/config",
     
     # 文档目录
     "docs",

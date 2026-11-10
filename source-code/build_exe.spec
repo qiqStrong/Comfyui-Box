@@ -7,13 +7,23 @@ block_cipher = None
 # 必需数据文件
 _datas = [
     ('dist', 'dist'),
-    ('assets', 'assets'),
+    # 随包只读资源（图标、模型、默认配置模板），由 backend/src/utils/paths.py 的
+    # get_resource_dir() 解析为 _internal/resource
+    ('resource', 'resource'),
     ('comfyui_box_version.py', '.'),
     ('backend/__init__.py', 'backend'),
     (os.path.join('backend', 'src'), os.path.join('backend', 'src')),
-    (os.path.join('backend', 'models', 'nsfw.onnx'), os.path.join('models')),
     (os.path.join('backend', 'lib', 'webview2_netcore'), os.path.join('backend', 'lib', 'webview2_netcore')),
 ]
+
+# 发布元数据：version.json 随包分发，离线时也能展示当前构建的更新说明。
+# 源码仓库中它位于 source-code 的上一级；缺失时跳过而不是中断打包。
+_version_json = os.path.abspath(os.path.join('..', 'version.json'))
+if os.path.isfile(_version_json):
+    _datas.append((_version_json, '.'))
+    print(f"[spec] 已加入 version.json: {_version_json}")
+else:
+    print('[spec] 未找到 version.json，跳过（离线更新说明将不可用）')
 
 # 可选数据目录：LibreHardwareMonitor 依赖的 DLL 需本地自行安装，缺失时跳过而非中断打包
 for _src, _dst in [
@@ -297,7 +307,7 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon='icon.ico',
+    icon=os.path.join('resource', 'img', 'logo', 'icon.ico'),
     uac_admin=True,
     manifest=_manifest,
 )

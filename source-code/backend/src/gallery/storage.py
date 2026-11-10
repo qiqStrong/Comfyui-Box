@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Optional
 from datetime import datetime
 
-from backend.src.utils.paths import get_data_dir
+from backend.src.utils.paths import get_scope_category_dir
 from backend.src.utils.logger import app_logger as logger
 from .models import GalleryData, GallerySettings, AssetCategory, Asset
 
@@ -20,11 +20,21 @@ class GalleryStorage:
     """资产库存储服务"""
 
     def __init__(self):
-        self._data_dir = get_data_dir() / "gallery"
-        self._assets_file = self._data_dir / "assets.json"
-        self._thumbnails_dir = self._data_dir / "thumbnails"
         self._data: Optional[GalleryData] = None
         self._lock = threading.Lock()
+        self._refresh_paths()
+
+    def _refresh_paths(self) -> None:
+        """按当前 scope 绑定重新计算物理路径（切换开关后调用）。"""
+        self._data_dir = get_scope_category_dir("gallery")
+        self._assets_file = self._data_dir / "assets.json"
+        self._thumbnails_dir = self._data_dir / "thumbnails"
+
+    def reset_scope(self) -> None:
+        """scope 变化后清空内存缓存并重算路径。"""
+        with self._lock:
+            self._data = None
+            self._refresh_paths()
 
     def _ensure_dirs(self):
         """确保目录存在"""

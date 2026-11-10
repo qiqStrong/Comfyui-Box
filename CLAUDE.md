@@ -2,7 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-> **Last verified**: 2026-11-01（「开发注意事项 8/9/10」按 Phase 1.1 密钥整改、Phase 1.2 HTTP 服务加固、Phase 1.3 更新包加固后的实际代码与命令输出核对；CI 门禁按 `.github/workflows/quality.yml` 与本地实测结果核对）。文中路径、命令与版本号均以实际命令输出核实；无法用命令验证的性能/体验类描述已标注"未核实"。
+> **Last verified**: 2026-11-10（资源目录统一到 `source-code/resource/`、`frontend/public/` 取消、运行数据移出版本控制；其余条目按 2026-11-01 核对结果保留）。文中路径、命令与版本号均以实际命令输出核实；无法用命令验证的性能/体验类描述已标注"未核实"。
 > 结构/版本类信息以本文件为唯一来源；产品功能介绍以根目录 `README.md` 为唯一来源，`source-code/README.md` 只做源码目录导航。
 
 ## 项目概述
@@ -138,8 +138,17 @@ backend/
 │   └── gallery/        # 资产库（图片 NSFW 检测、瀑布流）
 ├── main.py             # 应用入口（含首次启动的 Git/MinGit Bootstrap 引导）
 ├── MinGit-2.53.0-64-bit/  # 仅配置与文档骨架，**不含 git.exe**；可执行文件由 Bootstrap 下载或指向系统 Git
+├── resource/           # 随包只读资源（入库，三环境共用）
+│   ├── img/logo/       # icon.ico / icon.png / app-icon.png / favicon.ico
+│   ├── img/icons/      # tg-icon、github-mark、icons/app/（设计备选图）
+│   ├── img/qr/         # sponsor-qr、tg-qr
+│   ├── img/avatars/    # AI 平台头像
+│   ├── models/         # nsfw.onnx
+│   └── config/         # default_config.json 等随包默认模板（只读）
 └── tests/              # 测试套件
 ```
+
+**资源引用规则**：Python 侧统一经 `src/utils/paths.py` 的 `get_resource_dir()` 及派生函数（`get_resource_logo_dir` / `get_resource_icons_dir` / `get_resource_qr_dir` / `get_resource_avatars_dir` / `get_resource_models_dir` / `get_resource_config_dir`）；前端侧经 Vite `publicDir`（指向 `../resource/img`）以 `/logo/...` 等稳定 URL 引用。禁止在 `backend/`、仓库根另立图片或模型文件。
 
 **关键约定：**
 - **API 暴露规则**：`src/bridge/api.py` 的 `class Api` 中仅公开方法暴露给前端，私有属性以 `_` 开头（pywebview 序列化限制）
@@ -251,9 +260,9 @@ process_manager.start(python_path, comfyui_path, args=None, env_config=None)  # 
   - `source-code/dist/`：前端构建输出，同时是开发模式下后端托管的目录
   - `source-code/build/`、`source-code/backend/{build,dist}/`：PyInstaller 中间产物 / 输出
   - `source-code/frontend/coverage/`、`source-code/frontend/tsconfig.tsbuildinfo`
-- 构建相关文件只保留源码、`package-lock.json`、`frontend/public/` 静态资源和测试；运行数据与本地配置的入库策略另行评估。
+- 构建相关文件只保留源码、`package-lock.json`、`resource/` 随包静态资源和测试；运行数据与本地配置一律不入库。
 - 克隆后首次运行后端前，必须先 `cd source-code/frontend && npm run build`；否则 `main.py` 找不到 `dist/index.html`，无法进入主界面。
-- 修改静态资源请改 `frontend/public/`，不要改 `dist/` 下的拷贝（会被下次构建覆盖）。
+- 修改静态资源请改 `source-code/resource/`（`img/logo`、`img/icons`、`img/qr`、`img/avatars`、`models`、`config`），不要改 `dist/` 下的拷贝（会被下次构建覆盖）。Vite 的 `publicDir` 已指向 `../resource/img`，构建时原样复制到 `dist` 根，因此前端引用写作 `/logo/...`、`/icons/...`、`/qr/...`、`/avatars/...`。
 - 如果历史提交中已跟踪构建产物，用 `git rm -r --cached <路径>` 移出版本控制（保留本地文件），然后提交；不要用不带 `--cached` 的 `git rm`。
 - **不要用 `git ls-files -ci --exclude-standard` 批量清理**：仓库中有刻意强制跟踪的依赖与配置（如 `backend/lib/webview2_netcore/*.dll`），批量操作会误删。只清理上列构建产物路径。
 - 防回归：提交前可用 `git ls-files -- 'source-code/dist/**' 'source-code/build/**' 'source-code/frontend/coverage/**' 'source-code/frontend/tsconfig.tsbuildinfo'` 检查，输出必须为空。
@@ -303,7 +312,7 @@ process_manager.start(python_path, comfyui_path, args=None, env_config=None)  # 
 ### 11. 开发模式运行期事实（调试必读）
 
 - **HTTP 端口**：后端从 **5000** 起自动探测可用端口（`utils/http_server.py:93` 的 `find_available_port(start_port=5000)`），不是固定端口；以日志 `[端口] 使用端口: <port> (自动分配)` 为准。
-- **首次启动落盘**：会在 `source-code\data\gallery\` 新建空库 `assets.json` 与缩略图目录，配置写入 `source-code\backend\config\settings.json`；两者均被 `.gitignore` 忽略、不入库。
+- **首次启动落盘**：用户级数据（空资产库 `assets.json`、缩略图、`settings.json` 等）写入用户数据根，默认 `%LOCALAPPDATA%\Comfyui-Box\userdata`（机器级单一指针 `userdata.location`，源码版与发布版共用）；运行级日志/缓存/WebView2 写入项目目录（发布版为安装根，源码版为 `source-code/`）。
 - **Git 来源**：仓库内 `backend/MinGit-2.53.0-64-bit/` 不含 `git.exe`（被 `source-code/.gitignore` 的 `*.exe` 忽略），运行期按“内置 MinGit → 系统 Git → 否决”回退（`utils/git_manager.py`）。
 
 ## 测试策略
@@ -332,8 +341,10 @@ process_manager.start(python_path, comfyui_path, args=None, env_config=None)  # 
 
 ### 后端调试
 - `main.py:58` 的 `SIMULATE_FROZEN = True` 用于模拟打包环境；注意当前 `elif SIMULATE_FROZEN` 与 `else` 两个分支的 `base_path` 表达式相同（`Path(__file__).parent.parent` → `source-code/`），因此该开关本身不改变路径解析，只在 frozen 判定顺序上有意义
-- **日志位置**：`source-code/logs/comfyui-box_<YYYYMMDD_HHMMSS>.log`
-  - 目录由 `src/utils/paths.py` 的 `get_log_dir()`（`<项目根>/logs`）决定，`src/utils/logger.py:415-417` 调用；写入用自定义 `DateRotatingFileHandler`（`logger.py:258`、`:455`）
+- **日志位置**：源码版 `source-code/logs/comfyui-box_<YYYYMMDD_HHMMSS>.log`；发布版 `<安装根>\logs\...`。
+  - 目录由 `src/utils/paths.py` 的 `get_log_dir()`（运行数据根下的 `logs/`，运行数据根默认是项目根）决定，`src/utils/logger.py:415-417` 调用；写入用自定义 `DateRotatingFileHandler`（`logger.py:258`、`:455`）
+  - 运行数据根可用设置 `storage.runtimeDataDir` 覆盖（设置页“运行数据目录”）；项目目录不可写时降级到 `%TEMP%\Comfyui-Box\runtime-data`，并在设置页告警
+  - 缓存（`cache/`）与 WebView2 用户数据（`webview2/`）与日志同源，均在运行数据根下；旧 `<用户数据根>/logs|cache` 原地保留，不删除、不搬迁
   - 清理策略：按数量保留 10 个（`cleanup_old_logs_by_count`, `logger.py:186`）或按天数保留 30 天（`cleanup_old_logs`, `logger.py:103`）
   - 不存在 `data/logs/app.log` 这个路径
 - 使用 `app_logger.debug()` 输出调试信息
@@ -351,3 +362,44 @@ process_manager.start(python_path, comfyui_path, args=None, env_config=None)  # 
   - Python: snake_case（函数/变量），PascalCase（类）
   - TypeScript: camelCase（函数/变量），PascalCase（组件/类型）
 - **文档字符串**: Python 函数必须有 docstring，复杂逻辑加注释说明
+
+### 强制禁令（提交前逐条自查，违反即返工）
+
+以下五类写法在本仓库**一律禁止**，不接受"先这样、以后改"。
+
+**1. 禁止命名随意**
+- 禁用无意义标识符：`a`、`b`、`c`、`temp`、`tmp`、`data`、`data1`、`obj`、`res`、`info`、`flag`（除非是极短作用域的循环下标 `i/j`）。
+- 禁止同一文件内混用命名风格（如 `getUserData` 与 `get_user_data` 并存）。Python 用 snake_case，TypeScript 用 camelCase，组件与类型用 PascalCase。
+- 函数名必须"见名知意"：动词 + 名词，如 `resolve_user_data_root()`，不得用 `handle()`、`process()`、`do_stuff()`。
+- 布尔值以 `is_` / `has_` / `can_` / `should_` 开头。
+
+**2. 禁止格式混乱**
+- 缩进统一：Python 4 空格，TypeScript 2 空格，禁止混用 Tab。
+- 单行长度上限：Python 120 字符，TypeScript 120 字符；超长必须换行。
+- 一行只写一条语句，禁止 `a = 1; b = 2` 这类挤压写法（TypeScript 的 `for` 头部除外）。
+- 逻辑块之间必须空行分隔：函数之间空两行（Python）/ 一行（TypeScript），`import` 组与代码体之间空一行。
+- 提交前必须过格式化工具，不得手工凑格式。
+
+**3. 禁止逻辑堆砌**
+- 单函数长度上限 **50 行**，超出必须拆分。
+- 嵌套深度上限 **4 层**，超出用早返回（early return）或提取子函数展平。
+- 一个函数只做一件事。出现"既读配置又算路径又写日志又发网络请求"即为职责不清，必须拆分。
+- 修改一处会牵动全身的代码视为设计缺陷，重构后再提交。
+
+**4. 禁止注释失职**
+- 必须解释 **为什么**，而不是复述代码在做什么。`# 自增 i` 这类注释一律删除。
+- 公开函数必须有 docstring，说明用途、参数、返回值、异常与副作用。
+- 注释与代码不一致时，以代码为准并立即修正注释；过期注释比没有注释更有害。
+- 涉及安全边界（路径收敛、密钥、外部输入）与业务规则（保留策略、重试次数）的位置必须有注释说明依据。
+
+**5. 禁止重复与硬编码**
+- 同一段逻辑出现两次即提取函数，出现三次即提取模块。
+- 禁止魔法数字与魔法字符串散落：端口、超时、重试次数、路径片段、上限值一律定义为模块级常量并命名。
+- 禁止在多个文件里重复拼接同一路径：路径统一由 `src/utils/paths.py` 解析，资源根统一由 `get_resource_dir()` 及其派生函数提供。
+- 禁止复制粘贴式"改一个变量"的新函数，改用参数化。
+
+**资源与路径的硬性约定（配合 `resource/` 目录规范）**
+- 随包只读资源只放在 `source-code/resource/` 下，禁止在 `backend/`、`frontend/public/`、仓库根另立图片/图标/模型文件。
+- 新增资源引用时，Python 侧必须走 `paths.get_resource_*()`，TypeScript 侧必须走 `/img/` 下的稳定 URL，禁止手写相对路径穿透目录。
+- `source-code/data/`、`source-code/logs|cache|webview2|lora_data/` 是运行期产物，**一律不入库**；不要把示例数据、默认数据放进这些目录充当随包资源。
+- 例外：仓库根目录的 `version.json`、`comfyui_api_nodes.json`、`comfyui_releases.json`、`pytorch_mapping.json` 是对外公开的 GitHub raw 端点（`https://raw.githubusercontent.com/qiqStrong/Comfyui-Box/main/<file>`），已被已发布客户端与 CI 引用，**位置不可变更**。

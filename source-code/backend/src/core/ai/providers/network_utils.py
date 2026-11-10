@@ -27,7 +27,7 @@ def get_proxy_from_settings(force_enable: Optional[bool] = None) -> Optional[str
         str: 代理地址（格式：http://host:port），如果未启用则返回 None
         
     Note:
-        读取 backend/config/settings.json 中的 proxy 配置
+        读取用户数据根 config/settings.json 中的 proxy 配置
     """
     try:
         # 如果强制禁用代理，直接返回 None
@@ -90,7 +90,7 @@ def create_proxy_connector(use_proxy: bool = True) -> aiohttp.TCPConnector:
         aiohttp.TCPConnector: 配置好的连接器
         
     Note:
-        - 从系统设置（backend/config/settings.json）读取代理配置
+        - 从系统设置（用户数据根 config/settings.json）读取代理配置
         - 每次请求后关闭连接，避免连接池问题
         - 本地服务（如 Ollama）不应使用代理
         

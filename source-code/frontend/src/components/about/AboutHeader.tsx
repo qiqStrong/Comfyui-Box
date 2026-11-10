@@ -43,7 +43,7 @@ export function AboutHeader({ version }: AboutHeaderProps) {
       <header className="flex flex-col justify-between gap-4 border-b border-border pb-4 sm:flex-row sm:items-start">
         <div className="flex items-start gap-4">
           <img
-            src="/app-icon.png"
+            src="/logo/app-icon.png"
             alt="Comfyui-Box"
             className="size-14"
           />

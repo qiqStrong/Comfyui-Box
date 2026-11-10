@@ -219,6 +219,8 @@ def get_userdata_status() -> Dict[str, Any]:
         pointer_target = None
 
     counts = collect_counts(root)
+    runtime_base, runtime_source, runtime_note = paths.resolve_runtime_dir()
+    runtime_override = paths.get_runtime_data_override()
     return {
         "success": True,
         "root": str(root),
@@ -233,6 +235,14 @@ def get_userdata_status() -> Dict[str, Any]:
         "project_root": str(paths.get_project_root()),
         "counts": counts,
         "fallback_reason": paths.get_user_data_resolution_note(),
+        "runtime_dir": str(runtime_base),
+        "runtime_default": str(paths.get_project_root()),
+        "runtime_source": runtime_source,
+        "runtime_override": str(runtime_override) if runtime_override else None,
+        "runtime_note": runtime_note,
+        "log_dir": str(paths.get_log_dir()),
+        "cache_dir": str(paths.get_cache_dir()),
+        "webview2_dir": str(paths.get_webview2_dir()),
         "legacy_sources": detect_legacy_sources(),
         "wipe_pending": (root / paths.WIPE_REQUEST_FILENAME).exists(),
     }
@@ -340,6 +350,56 @@ def set_user_data_root(root: str, copy_current: bool = False) -> Dict[str, Any]:
         "migration": copied,
     })
     return status
+
+
+def set_runtime_data_root(path_value: str) -> Dict[str, Any]:
+    """
+    设置运行数据目录（日志/缓存/WebView2 的父目录，重启后生效）。
+
+    Args:
+        path_value: 绝对路径；空字符串表示恢复默认（项目根目录）
+
+    说明：
+        该设置写入用户配置 config/settings.json → storage.runtimeDataDir，
+        仅在用户明确选择时生效；默认仍是项目相对路径。当前进程的日志句柄与
+        WebView2 数据目录不会热切换，因此需要重启。
+    """
+    value = (path_value or "").strip()
+    if value:
+        target = Path(value).expanduser()
+        if not target.is_absolute():
+            raise ValueError("运行数据目录必须是绝对路径")
+        target = target.resolve()
+        if target == paths.get_project_root().resolve():
+            value = ""
+        else:
+            target.mkdir(parents=True, exist_ok=True)
+            probe = target / ".comfyui-box-write-test"
+            try:
+                probe.write_text("ok", encoding="utf-8")
+                probe.unlink()
+            except OSError as exc:
+                raise ValueError(f"目录不可写: {target} ({exc})") from exc
+            value = str(target)
+
+    from backend.src.core.settings_manager import SettingsManager
+
+    result = SettingsManager().update_settings({
+        paths.RUNTIME_DATA_SETTING_SECTION: {paths.RUNTIME_DATA_SETTING_KEY: value}
+    })
+    if not result.get("success"):
+        return {"success": False, "error": result.get("message") or "保存运行数据目录失败"}
+
+    # 清缓存让当前进程的读取立即反映新配置（日志文件句柄仍需重启才会切换）
+    paths.reset_runtime_dir_cache()
+    return {
+        "success": True,
+        "runtime_dir": str(paths.get_runtime_data_dir()),
+        "runtime_source": paths.get_runtime_data_source(),
+        "runtime_note": paths.get_runtime_data_resolution_note(),
+        "settings_file": str(paths.get_settings_file()),
+        "restart_required": True,
+    }
 
 
 def inspect_user_data_root(path_value: str) -> Dict[str, Any]:
@@ -533,8 +593,13 @@ def _business_is_empty(root: Path) -> bool:
     )
 
 
-def _migrate_blocking(source_root: Path, target_root: Path) -> Dict[str, Any]:
-    """执行迁移（同步）：复制到暂存 → 校验 → 合并到目标 → 校验 → 失败回滚。"""
+def _migrate_blocking(source_root: Path, target_root: Path, mark_job: bool = True) -> Dict[str, Any]:
+    """执行迁移（同步）：复制到暂存 → 校验 → 合并到目标 → 校验 → 失败回滚。
+
+    Args:
+        mark_job: 是否在结束时把任务状态置为完成/失败。后台迁移由 start_migration
+            在写完指针后再统一收尾，避免测试/UI 在指针写入前读到“已完成”。
+    """
     source_root = Path(source_root).resolve()
     target_root = Path(target_root).resolve()
     if source_root == target_root:
@@ -647,7 +712,8 @@ def _migrate_blocking(source_root: Path, target_root: Path) -> Dict[str, Any]:
             "key_verification": key_check,
             "skipped_existing": True,
         }
-        _set_job(running=False, current="完成", result=result, done=total_files)
+        if mark_job:
+            _set_job(running=False, current="完成", result=result, done=total_files)
         logger.info("[迁移] 完成: %s 个文件；密钥校验 %s", copied, key_check)
         return result
 
@@ -655,7 +721,8 @@ def _migrate_blocking(source_root: Path, target_root: Path) -> Dict[str, Any]:
         logger.error("[迁移] 失败: %s", exc, exc_info=True)
         _rollback(created_files, created_dirs)
         result = {"success": False, "error": str(exc), "source_root": str(source_root), "target_root": str(target_root)}
-        _set_job(running=False, current="失败", result=result)
+        if mark_job:
+            _set_job(running=False, current="失败", result=result)
         return result
     finally:
         if staging.exists():
@@ -684,8 +751,10 @@ def start_migration(source_root: str, target_root: Optional[str] = None) -> Dict
         return {"success": False, "error": str(exc)}
 
     def _run() -> None:
-        result = _migrate_blocking(source, target)
+        # 收尾（写指针/标记）完成后再把任务标记为结束，避免提前读到缺少 restart_required 的结果
+        result = _migrate_blocking(source, target, mark_job=False)
         if not result or not result.get("success"):
+            _set_job(running=False, current="失败", result=result)
             return
         # 迁移到新目录时必须同时写机器级指针，否则重启后仍回到默认目录
         if target.resolve() != paths.get_user_data_root().resolve():
@@ -726,15 +795,28 @@ def _delete_tree_contents(root: Path) -> Tuple[int, List[str]]:
 
 
 def clean_cache_and_logs(scopes: Optional[List[str]] = None) -> Dict[str, Any]:
-    """清理缓存/日志（可安全删除，下次启动自动重建）。"""
+    """
+    清理缓存/日志（运行级目录，可安全删除，下次启动自动重建）。
+
+    说明：
+        只清理项目相对路径下的运行数据（<运行数据根>/cache、<运行数据根>/logs）；
+        旧布局 <用户数据根>/cache、<用户数据根>/logs 原地保留，不删除、不搬迁。
+    """
     scopes = scopes or ["cache", "logs"]
-    root = paths.get_user_data_root()
-    result: Dict[str, Any] = {"success": True, "root": str(root), "deleted": {}, "errors": []}
+    result: Dict[str, Any] = {
+        "success": True,
+        "root": str(paths.get_user_data_root()),
+        "runtime_dir": str(paths.resolve_runtime_dir()[0]),
+        "cache_dir": str(paths.get_cache_dir()),
+        "log_dir": str(paths.get_log_dir()),
+        "deleted": {},
+        "errors": [],
+    }
     for scope in scopes:
         if scope == "cache":
-            target = root / "cache"
+            target = paths.get_cache_dir()
         elif scope == "logs":
-            target = root / "logs"
+            target = paths.get_log_dir()
         else:
             result["success"] = False
             result["errors"].append(f"未知清理范围: {scope}")

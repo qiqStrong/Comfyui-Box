@@ -224,3 +224,6 @@ ComfyNexus运行环境检测/
 # 只忽略该目录下的 json，data/prompt/images/ 里需要入库的提示词示意图不受影响
 /source-code/data/prompt/*.json
 /wx.png
+
+# 测试隔离数据副本（从生产用户数据根复制，含密钥/业务元数据，绝不入库）
+/test-data/

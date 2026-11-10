@@ -342,10 +342,33 @@ def setup_logger():
 logger = setup_logger()
 
 
+def get_app_icon_path() -> Path:
+    """
+    定位更新器界面使用的应用 logo（随包只读资源）
+
+    说明：
+        更新器是独立打包的单文件 exe，无法 import 主应用的 paths 模块，
+        因此这里内联候选路径；首个存在的即为准。
+    """
+    base_path = get_project_root()
+    candidates = [
+        base_path / 'resource' / 'img' / 'logo' / 'app-icon.png',
+        base_path / '_internal' / 'resource' / 'img' / 'logo' / 'app-icon.png',
+        base_path / 'dist' / 'logo' / 'app-icon.png',
+    ]
+    # onefile 打包时资源解压在 _MEIPASS 临时目录
+    meipass = getattr(sys, '_MEIPASS', None)
+    if meipass:
+        candidates.insert(0, Path(meipass) / 'resource' / 'img' / 'logo' / 'app-icon.png')
+    for candidate in candidates:
+        if candidate.exists():
+            return candidate
+    return candidates[-1]
+
+
 def get_icon_base64() -> str:
     try:
-        base_path = get_project_root()
-        icon_path = base_path / 'dist' / 'app-icon.png'
+        icon_path = get_app_icon_path()
         logger.debug(f"查找图标: {icon_path}")
         if icon_path.exists():
             with open(icon_path, 'rb') as f:

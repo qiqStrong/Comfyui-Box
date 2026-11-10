@@ -13,9 +13,10 @@ __pycache__/
 lora_data/
 .trae/
 docs/
-data/
+# 运行期用户数据（源码版根目录 data/），锚定根目录避免误伤 resource/ 下同名目录
+/data/
 # 本机 AI 服务商密钥文件（由 backend/src/core/ai/secret_store.py 生成，绝不可入库）
-data/secrets/
+/data/secrets/
 build/
 develop-eggs/
 dist/
@@ -180,6 +181,7 @@ build_scripts/cache/
 
 # WebView2 user data (browser cache, download preferences, etc.)
 data/webview2/
+/webview2/
 
 # Build outputs and artifacts
 build_scripts/打包产物_*/
@@ -196,23 +198,35 @@ temp/
 temp_nuget/
 
 # User-specific configurations (keep templates)
-backend/config/environments.json
-backend/config/modules.json
+# 用户级配置实际写在用户数据根（%LOCALAPPDATA% 指针指向处），不在仓库内。
+# 以下规则只兜底历史遗留路径，防止本机配置被误提交。
 backend/config/settings.json
-backend/config/folder_shortcuts.json
-
-# Preset configurations (user-specific)
+backend/config/environments.json
 backend/config/preset_index.json
-backend/config/presets/*.json
-!backend/config/presets/.gitkeep
-
-# Plugin configurations (user-specific)
-backend/config/plugins/*.json
-!backend/config/plugins/.gitkeep
+# 预设由用户在运行时产生，整目录不入库（随包模板在 resource/config/presets/）
+backend/config/presets/
+backend/config/plugins/
 
 # Frontend backend config (user-specific runtime files)
 frontend/backend/config/settings.json
 frontend/backend/config/plugins/*.json
+
+# ============================================
+# 运行期产物（源码版落在 source-code/ 根目录，一律不入库）
+# ============================================
+/data/
+/cache/
+/logs/
+/webview2/
+/lora_data/
+/images/
+scripts/comfyui_core_nodes.json
+
+# ============================================
+# 随包只读资源（resource/）必须入库
+# 该目录只放图标、模型、默认配置模板，三环境共用
+# ============================================
+!/resource/
 
 
 

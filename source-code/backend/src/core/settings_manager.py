@@ -87,6 +87,11 @@ class SettingsManager(ConfigMigrator):
                 "keepDays": 30,
                 "maxFileSize": 104857600  # 100MB
             },
+            "storage": {
+                # 运行数据目录（日志/缓存/WebView2 的父目录）
+                # 空字符串 = 项目相对路径（发布版为安装根，源码版为 source-code/）
+                "runtimeDataDir": ""
+            },
             "github": {
                 "apiToken": "",  # GitHub Personal Access Token，用于提高 API 请求限制
                 "enabled": False  # 是否启用 GitHub API Token

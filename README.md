@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="banner.png" alt="Comfyui-Box">
+<img src="docs/assets/banner.png" alt="Comfyui-Box">
 
 <h1>Comfyui-Box</h1>
 
@@ -29,7 +29,7 @@
 </p>
 
 <!-- 录屏演示位置：将下方图片链接替换为你的 GIF 演示视频 -->
-<img src="demo.gif" alt="Demo" width="800">
+<img src="docs/assets/demo.gif" alt="Demo" width="800">
 
 </div>
 

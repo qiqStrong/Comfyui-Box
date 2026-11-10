@@ -7,11 +7,11 @@ block_cipher = None
 # 必需数据文件
 _datas = [
     ('dist', 'dist'),
-    ('assets', 'assets'),
+    # 随包只读资源（图标、模型、默认配置模板），由 get_resource_dir() 解析
+    ('resource', 'resource'),
     ('comfyui_box_version.py', '.'),
     ('backend/__init__.py', 'backend'),
     (os.path.join('backend', 'src'), os.path.join('backend', 'src')),
-    (os.path.join('backend', 'models', 'nsfw.onnx'), os.path.join('models')),
     (os.path.join('backend', 'lib', 'webview2_netcore'), os.path.join('backend', 'lib', 'webview2_netcore')),
 ]
 
@@ -297,7 +297,7 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon='icon.ico',
+    icon=os.path.join('resource', 'img', 'logo', 'icon.ico'),
     uac_admin=True,
     manifest=_manifest,
 )

@@ -18,7 +18,7 @@ export function SponsorSection({ className }: SponsorSectionProps) {
       </h2>
       <div className="flex flex-1 flex-col items-center justify-center">
         <img
-          src="/sponsor-qr.png"
+          src="/qr/sponsor-qr.png"
           alt="Sponsor QR Code"
           className="mb-4 size-32 rounded-md object-cover"
         />

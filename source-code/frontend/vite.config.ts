@@ -4,6 +4,9 @@ import path from 'path'
 
 export default defineConfig({
   root: __dirname,
+  // 静态资源统一放在 ../resource/img，构建时原样复制到 dist 根，
+  // 因此前端引用写作 /logo/... 、/icons/... 、/qr/... 、/avatars/...
+  publicDir: path.resolve(__dirname, '../resource/img'),
   plugins: [
     react(),
   ],

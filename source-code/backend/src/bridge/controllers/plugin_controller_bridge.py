@@ -273,6 +273,12 @@ class PluginControllerBridge:
         Returns:
             安装结果
         """
+        from backend.src.utils.test_isolation import guard_write
+
+        error = guard_write("安装插件依赖")
+        if error:
+            return {'success': False, 'error': error, 'log_file': None}
+
         if not self._ensure_environment_set():
             return {
                 'success': False,
@@ -319,6 +325,12 @@ class PluginControllerBridge:
         Returns:
             dict: 更新结果
         """
+        from backend.src.utils.test_isolation import guard_write
+
+        error = guard_write("更新插件")
+        if error:
+            return {'success': False, 'error': error}
+
         if not self._ensure_environment_set():
             return {
                 'success': False,
@@ -354,6 +366,12 @@ class PluginControllerBridge:
         Returns:
             dict: 更新结果，包含摘要统计
         """
+        from backend.src.utils.test_isolation import guard_write
+
+        error = guard_write("批量更新插件")
+        if error:
+            return {'success': False, 'error': error}
+
         if not self._ensure_environment_set():
             return {
                 'success': False,
@@ -421,6 +439,12 @@ class PluginControllerBridge:
             commit_hash: 分支的 commit hash（可选，前端已获取）
             commit_date: 分支的 commit date（可选，前端已获取）
         """
+        from backend.src.utils.test_isolation import guard_write
+
+        error = guard_write("切换插件分支")
+        if error:
+            return {'success': False, 'error': error}
+
         if not self._ensure_environment_set():
             return {
                 'success': False,
@@ -450,6 +474,12 @@ class PluginControllerBridge:
         Returns:
             dict: 切换结果
         """
+        from backend.src.utils.test_isolation import guard_write
+
+        error = guard_write("切换插件版本")
+        if error:
+            return {'success': False, 'error': error}
+
         if not self._ensure_environment_set():
             return {
                 'success': False,
@@ -487,6 +517,12 @@ class PluginControllerBridge:
     
     def uninstall_plugin(self, plugin_name: str) -> Dict:
         """卸载插件"""
+        from backend.src.utils.test_isolation import guard_write
+
+        error = guard_write("卸载插件")
+        if error:
+            return {'success': False, 'error': error}
+
         if not self._ensure_environment_set():
             return {
                 'success': False,
@@ -517,6 +553,12 @@ class PluginControllerBridge:
     
     def toggle_plugin_enabled(self, plugin_name: str, enabled: bool) -> Dict:
         """切换插件启用/禁用状态"""
+        from backend.src.utils.test_isolation import guard_write
+
+        error = guard_write("启用/禁用插件")
+        if error:
+            return {'success': False, 'error': error}
+
         if not self._ensure_environment_set():
             return {
                 'success': False,
@@ -584,6 +626,11 @@ class PluginControllerBridge:
         Returns:
             dict: 操作结果
         """
+        from backend.src.utils.test_isolation import guard_write
+
+        error = guard_write("修改插件远端地址")
+        if error:
+            return {'success': False, 'error': error}
         if not self._ensure_environment_set():
             return {
                 'success': False,

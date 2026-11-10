@@ -13,7 +13,7 @@ import logging
 import asyncio
 
 # 导入 AI 模块
-from backend.src.core.ai.database import init_database
+from backend.src.core.ai.database import init_database, refresh_scope
 from backend.src.core.ai.topic_manager import TopicManager
 from backend.src.core.ai.message_repository import MessageRepository
 from backend.src.core.ai.ai_service import AIService
@@ -45,7 +45,8 @@ class AIController:
         self.window = window
         logger.info("AI 控制器初始化")
         
-        # 初始化数据库
+        # 启动时按当前数据范围绑定解析数据库路径，再初始化
+        refresh_scope()
         init_database()
         
         # 初始化服务层组件

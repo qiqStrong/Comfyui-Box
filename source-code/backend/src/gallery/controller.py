@@ -18,7 +18,7 @@ from typing import Optional
 from flask import send_file, Response
 
 from backend.src.utils.logger import app_logger as logger
-from backend.src.utils.paths import get_data_dir
+from backend.src.utils.paths import get_data_dir, get_scope_category_dir
 from backend.src.core.prompt_library import PromptLibraryService
 from .storage import gallery_storage
 from .scanner import gallery_scanner
@@ -29,8 +29,16 @@ class GalleryController:
     """资产库控制器"""
 
     def __init__(self):
-        self._data_dir = get_data_dir() / "gallery"
+        self._refresh_paths()
+
+    def _refresh_paths(self) -> None:
+        """按当前 scope 绑定重新计算资产库目录。"""
+        self._data_dir = get_scope_category_dir("gallery")
         self._thumbnails_dir = self._data_dir / "thumbnails"
+
+    def reset_scope(self) -> None:
+        """scope 变化后重算路径。"""
+        self._refresh_paths()
 
     def gallery_get_assets(self) -> dict:
         """
@@ -851,7 +859,7 @@ class GalleryController:
             if not asset_ids:
                 return {"success": False, "error_message": "未选择资产"}
 
-            export_dir = get_data_dir() / "exports"
+            export_dir = get_scope_category_dir("gallery", "exports")
             export_dir.mkdir(parents=True, exist_ok=True)
 
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")

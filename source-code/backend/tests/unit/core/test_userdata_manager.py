@@ -165,19 +165,76 @@ def test_inspect_root_reports_existing_business_data(user_root):
     assert info["counts"]["assets"] == 1
 
 
-def test_clean_cache_and_logs(user_root):
-    cache = user_root / "cache"
-    logs = user_root / "logs"
-    (cache / "marketplace").mkdir(parents=True)
-    (cache / "marketplace" / "plugins.json").write_text("{}", encoding="utf-8")
-    logs.mkdir(parents=True)
-    (logs / "app.log").write_text("line", encoding="utf-8")
+def test_clean_cache_and_logs_targets_runtime_dirs_and_keeps_legacy(user_root, monkeypatch, tmp_path):
+    """清理只作用于项目相对运行目录；旧用户数据根内的 cache/logs 原地保留。"""
+    runtime_cache = tmp_path / "install" / "cache"
+    runtime_logs = tmp_path / "install" / "logs"
+    (runtime_cache / "marketplace").mkdir(parents=True)
+    (runtime_cache / "marketplace" / "plugins.json").write_text("{}", encoding="utf-8")
+    runtime_logs.mkdir(parents=True)
+    (runtime_logs / "app.log").write_text("line", encoding="utf-8")
+
+    # 旧布局：用户数据根内的 cache/logs 必须保留
+    legacy_cache = user_root / "cache" / "legacy.json"
+    legacy_logs = user_root / "logs" / "legacy.log"
+    legacy_cache.parent.mkdir(parents=True)
+    legacy_cache.write_text("{}", encoding="utf-8")
+    legacy_logs.parent.mkdir(parents=True)
+    legacy_logs.write_text("old", encoding="utf-8")
+
+    monkeypatch.setattr(paths, "get_cache_dir", lambda subdir=None: runtime_cache)
+    monkeypatch.setattr(paths, "get_log_dir", lambda subdir=None: runtime_logs)
 
     result = manager.clean_cache_and_logs(["cache", "logs"])
 
     assert result["success"] is True
-    assert not list(cache.iterdir())
-    assert not list(logs.iterdir())
+    assert result["cache_dir"] == str(runtime_cache)
+    assert result["log_dir"] == str(runtime_logs)
+    assert not list(runtime_cache.iterdir())
+    assert not list(runtime_logs.iterdir())
+    assert legacy_cache.exists()
+    assert legacy_logs.exists()
+
+
+def test_set_runtime_data_root_persists_and_resets(user_root, tmp_path):
+    """设置页改运行数据目录：写入 settings、立即解析、可恢复默认。"""
+    override = tmp_path / "runtime-override"
+
+    result = manager.set_runtime_data_root(str(override))
+
+    assert result["success"] is True
+    assert result["runtime_source"] == "override"
+    assert result["restart_required"] is True
+    settings_file = user_root / "config" / "settings.json"
+    data = json.loads(settings_file.read_text(encoding="utf-8"))
+    assert data["storage"]["runtimeDataDir"] == str(override.resolve())
+
+    reset = manager.set_runtime_data_root("")
+    assert reset["success"] is True
+    assert paths.get_runtime_data_override() is None
+    assert reset["runtime_source"] == "project"
+
+
+def test_set_runtime_data_root_rejects_relative_path(user_root):
+    with pytest.raises(ValueError):
+        manager.set_runtime_data_root("relative/path")
+
+
+def test_status_reports_runtime_paths(user_root, monkeypatch, tmp_path):
+    """状态接口返回运行数据目录与来源，供设置页展示。"""
+    monkeypatch.setattr(paths, "resolve_runtime_dir", lambda override=None: (tmp_path / "install", "project", None))
+    monkeypatch.setattr(paths, "get_runtime_data_override", lambda: None)
+    monkeypatch.setattr(paths, "get_log_dir", lambda subdir=None: tmp_path / "install" / "logs")
+    monkeypatch.setattr(paths, "get_cache_dir", lambda subdir=None: tmp_path / "install" / "cache")
+    monkeypatch.setattr(paths, "get_webview2_dir", lambda: tmp_path / "install" / "webview2")
+
+    status = manager.get_userdata_status()
+
+    assert status["runtime_dir"] == str(tmp_path / "install")
+    assert status["runtime_source"] == "project"
+    assert status["log_dir"] == str(tmp_path / "install" / "logs")
+    assert status["cache_dir"] == str(tmp_path / "install" / "cache")
+    assert status["webview2_dir"] == str(tmp_path / "install" / "webview2")
 
 
 def test_business_wipe_applies_on_next_start(user_root):

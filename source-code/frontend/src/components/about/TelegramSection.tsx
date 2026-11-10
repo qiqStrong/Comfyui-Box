@@ -25,7 +25,7 @@ export function TelegramSection({ className }: TelegramSectionProps) {
       </h2>
       <div className="flex flex-1 flex-col items-center justify-center">
         <img
-          src="/tg-qr.png"
+          src="/qr/tg-qr.png"
           alt="Telegram Group QR Code"
           className="mb-4 size-32 rounded-md object-cover"
         />
@@ -35,7 +35,7 @@ export function TelegramSection({ className }: TelegramSectionProps) {
           onClick={handleJoinGroup}
           className="gap-2"
         >
-          <img src="/tg-icon.png" alt="Telegram" className="size-4" />
+          <img src="/icons/tg-icon.png" alt="Telegram" className="size-4" />
           {t('about.telegram.joinButton')}
         </Button>
       </div>

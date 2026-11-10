@@ -106,7 +106,7 @@ class ConfigManager:
         """迁移前备份数据库文件；失败只告警。"""
         import shutil
 
-        db_path = database.DB_PATH
+        db_path = database.get_db_path()
         if not db_path.exists():
             logger.warning("[配置管理] 数据库文件不存在，跳过备份: %s", db_path)
             return None

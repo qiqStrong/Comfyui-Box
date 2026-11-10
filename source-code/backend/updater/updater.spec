@@ -17,7 +17,8 @@ a = Analysis(
     pathex=[str(project_root)],
     binaries=[],
     datas=[
-        (str(project_root / 'dist' / 'app-icon.png'), 'dist'),
+        # 更新器界面 logo：与主应用共用 resource 资源树，避免重复存放
+        (str(project_root / 'resource' / 'img' / 'logo' / 'app-icon.png'), 'resource/img/logo'),
     ],
     hiddenimports=[
         'webview',
@@ -95,5 +96,5 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=str(project_root / 'icon.ico'),
+    icon=str(project_root / 'resource' / 'img' / 'logo' / 'icon.ico'),
 )

@@ -196,6 +196,12 @@ class MarketplaceControllerBridge:
             }
         """
         try:
+            from backend.src.utils.test_isolation import guard_write
+
+            error = guard_write("从市场安装插件")
+            if error:
+                return {'success': False, 'error': error, 'message': error}
+
             logger.info(f"[Bridge] 安装插件: {github_url}, auto_install_deps={auto_install_deps}")
             
             # 定义进度回调函数（如果需要实时更新前端）

@@ -79,8 +79,7 @@ class WorkflowController:
             else:
                 default_workflows_dir = comfyui_path / "user" / "default" / "workflows"
 
-            custom_dir = None
-            use_global = False
+            # 保留旧配置的 env_paths 补全行为（首次为当前环境登记默认目录）
             if self._workflow_config_manager:
                 try:
                     config = self._workflow_config_manager.load_config()
@@ -89,21 +88,20 @@ class WorkflowController:
                         env_paths[env_id] = str(default_workflows_dir)
                         config["env_paths"] = env_paths
                         self._workflow_config_manager.save_config(config)
-                    use_global = config.get("use_global_path", False)
-                    if use_global:
-                        custom_dir = config.get("global_path", "") or None
-                    else:
-                        custom_dir = env_paths.get(env_id, None)
                 except Exception as e:
                     logger.warning(f"读取工作流配置失败，使用默认路径: {e}")
 
-            if custom_dir:
-                self._workflows_dir = Path(custom_dir)
-                self._workflows_dir.mkdir(parents=True, exist_ok=True)
-                logger.info(f"使用自定义工作流目录: {self._workflows_dir}")
-            else:
-                self._workflows_dir = default_workflows_dir
-            
+            # 路径由 scope 解析层决定：
+            # - 旧开关 use_global_path=true 解析为 global（行为与之前一致）
+            # - 未显式绑定时 false → private（根原生工作流目录）
+            from backend.src.core.scope import resolve_scope
+
+            resolved = resolve_scope("workflows", root_id=env_id)
+            use_global = resolved["mode"] == "global"
+            self._workflows_dir = Path(resolved["path"])
+            self._workflows_dir.mkdir(parents=True, exist_ok=True)
+            logger.info(f"使用工作流目录({resolved['mode']}/{resolved['source']}): {self._workflows_dir}")
+
             from backend.src.utils.paths import get_data_dir
             self._data_dir = get_data_dir() / "workflows"
             self._data_dir.mkdir(parents=True, exist_ok=True)

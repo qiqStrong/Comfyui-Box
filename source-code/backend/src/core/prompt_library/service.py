@@ -131,6 +131,16 @@ class PromptLibraryService:
         self.metadata_file = self.data_dir / "metadata.json"
         self._lock = threading.Lock()
         self._ensure_files_exist()
+
+    def refresh_scope(self) -> None:
+        """scope 切换后重新解析路径并确保数据文件存在。"""
+        with self._lock:
+            self.data_dir = get_prompt_data_dir()
+            self.images_dir = get_prompt_images_dir()
+            self.prompts_file = self.data_dir / "prompts.json"
+            self.categories_file = self.data_dir / "categories.json"
+            self.metadata_file = self.data_dir / "metadata.json"
+        self._ensure_files_exist()
     
     def _ensure_files_exist(self) -> None:
         """确保数据文件存在，不存在则创建"""

@@ -660,7 +660,17 @@ class EnvironmentManager:
             config_data = self.config_manager.load_config()
             
             # Add environment to config
-            config_data["environments"].append(environment.to_dict())
+            env_dict = environment.to_dict()
+
+            # 多包模型：为新环境补默认包与私有数据空间绑定（只写配置，不建目录、不迁数据）
+            try:
+                from backend.src.core.scope import bind_environment
+
+                bind_environment(config_data, env_dict)
+            except Exception as exc:
+                logger.warning(f"[add_environment] 写入包/空间绑定失败（忽略）：{exc}")
+
+            config_data["environments"].append(env_dict)
             
             # 将新添加的环境设置为当前环境
             config_data["current_environment_id"] = env_id
@@ -755,7 +765,15 @@ class EnvironmentManager:
             # If deleted environment was current, clear current environment
             if config_data.get("current_environment_id") == env_id:
                 config_data["current_environment_id"] = None
-            
+
+            # 清理该环境的私有空间记录（只删引用，不删任何真实文件）
+            try:
+                from backend.src.core.scope.resolver import remove_environment_binding
+
+                remove_environment_binding(config_data, env_id)
+            except Exception as exc:
+                logger.warning(f"[delete_environment] 清理空间引用失败（忽略）：{exc}")
+
             # Save config
             self.config_manager.save_config(config_data)
             
@@ -1362,7 +1380,7 @@ class EnvironmentManager:
         生命周期中只创建一个 PluginController 实例。
         
         配置说明：
-        - cache_dir: 插件缓存目录，存储在 backend/config/plugins
+        - cache_dir: 插件缓存目录，存储在用户数据根 config/plugins
         - git_path: Git 可执行文件路径，使用系统默认的 "git"
         - python_path: Python 路径，设置为 None（由 PluginController 自动检测）
         - max_workers: 最大并发数，设置为 10（平衡性能和资源占用）

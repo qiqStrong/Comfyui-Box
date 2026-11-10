@@ -8,6 +8,7 @@ from .manager import (
     initialize_user_data,
     request_business_wipe,
     set_user_data_root,
+    set_runtime_data_root,
     start_migration,
     clean_cache_and_logs,
 )
@@ -20,6 +21,7 @@ __all__ = [
     "initialize_user_data",
     "request_business_wipe",
     "set_user_data_root",
+    "set_runtime_data_root",
     "start_migration",
     "clean_cache_and_logs",
 ]

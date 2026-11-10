@@ -21,6 +21,7 @@ import { ChangelogDialog } from './components/about/ChangelogDialog'
 import { fetchReleases } from './api/githubApi'
 import { GlobalTextSelectionButton } from './components/common/GlobalTextSelectionButton'
 import { SystemProxyDetectedDialog } from './components/common/SystemProxyDetectedDialog'
+import { OnboardingDialog } from './components/common/OnboardingDialog'
 import { waitForAPI, validateAPIMethods, REQUIRED_API_METHODS, isDevelopment } from './utils/pywebview'
 import { loadLoggerConfigFromSettings } from './utils/logger'
 import { Button } from '@/components/ui/Button'
@@ -411,6 +412,7 @@ function AppInitializer() {
         onDontShowAgain={() => setWarningDismissed('systemProxyDetected', true)}
       />
       <GlobalTextSelectionButton />
+      <OnboardingDialog />
     </>
   )
 }

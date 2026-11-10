@@ -23,6 +23,7 @@ import { PromptSettingsButton } from '@/components/ai/PromptSettingsButton'
 import { PromptManagementDialog } from '@/components/ai/PromptManagementDialog'
 import { SearchSettings } from '@/components/ai/SearchSettings'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { ScopeBadge } from '@/components/common/ScopeBadge'
 import { Button } from '@/components/ui/Button'
 import { MessageSquare, Settings, Globe, Bot } from 'lucide-react'
 import { useTopicStore } from '@/stores/useTopicStore'
@@ -86,6 +87,7 @@ export default function AIAssistantPage() {
             {/* 右侧：模型选择器、系统提示词选择器和搜索设置 */}
             {activeTab === 'chat' && (
               <div className="flex items-center gap-3 pb-0.5">
+                <ScopeBadge category="ai" />
                 {/* 模型配置 */}
                 <div className="flex items-center gap-1.5">
                   <span className="whitespace-nowrap text-xs text-muted-foreground">

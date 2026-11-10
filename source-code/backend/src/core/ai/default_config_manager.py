@@ -2,7 +2,8 @@
 默认配置管理器
 
 负责管理全局默认 API 配置的读取、写入和清除操作。
-默认配置保存在 backend/config/default_config.json 文件中。
+默认配置保存在用户数据根的 config/default_config.json（用户级运行时状态），
+与随包的只读模板 resource/config/default_config.json 不是同一份文件。
 """
 
 import json
@@ -36,7 +37,7 @@ class DefaultConfigManager:
         初始化默认配置管理器
         
         Args:
-            config_path: 配置文件路径，默认为 backend/config/default_config.json
+            config_path: 配置文件路径，默认为 <用户数据根>/config/default_config.json
         """
         if config_path is None:
             # 使用绝对路径
