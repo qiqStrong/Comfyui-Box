@@ -344,6 +344,24 @@ process_manager.start(python_path, comfyui_path, args=None, env_config=None)  # 
 - **用户的发布版实例一律不动**：5000 端口、进程名 `Comfyui-Box.exe`。开发实例固定 5002，测试固定 5001，绝不占用 5000。
 - 一次验证只保留**一个**实例；需要换环境时先关旧的再开新的，避免多实例同时写同一份配置。
 
+### 14. dev / test 假数据（`source-code/scripts/dev_fixtures.py`）
+
+需要在 dev 或 test 环境验证全部页面时，用这个工具生成可识别的假数据，**不要手工往数据根里塞文件**。
+
+```bash
+cd source-code
+backend/.venv/Scripts/python.exe scripts/dev_fixtures.py seed  --env dev
+backend/.venv/Scripts/python.exe scripts/dev_fixtures.py clean --env dev
+backend/.venv/Scripts/python.exe scripts/dev_fixtures.py status --env dev
+```
+
+- **只支持 dev / test**，`--env prod` 直接抛错，不写入任何字节。
+- 所有产物落在 `<数据根>/fixtures/`，逐条登记在 `.fixture_manifest.json`；`clean` 按清单删除并还原备份。
+- 覆盖既有文件前备份到 `<数据根>/fixtures/backup/`；由 fixture 自己创建的文件不备份（否则 `clean` 会把假数据"还原"回去）。
+- 生成内容：假 ComfyUI 骨架（含本地裸仓库当 `origin`，离线可用）+ 资产库（媒体文件真的放进库目录，靠扫描器建索引）+ 提示词库 + LoRA 索引 + AI 对话。
+- **资产库不能只写 `assets.json`**：页面打开时会用 `libraryPath` 重扫磁盘，不在库目录内的资产会被全部删除。
+- 绝不指向真实 ComfyUI 路径，绝不写 prod 指针。
+
 ## 测试策略
 
 - **前端测试**：Vitest 4 + Testing Library；`npm run test` 是 watch 模式，CI/一次性验证用 `npm run test:run`
@@ -369,8 +387,8 @@ process_manager.start(python_path, comfyui_path, args=None, env_config=None)  # 
 - 开发模式下后端托管的是 `source-code/dist/`，改完前端需重新 `npm run build` 才能在桌面窗口看到效果
 
 ### 后端调试
-- `main.py:58` 的 `SIMULATE_FROZEN = True` 用于模拟打包环境；注意当前 `elif SIMULATE_FROZEN` 与 `else` 两个分支的 `base_path` 表达式相同（`Path(__file__).parent.parent` → `source-code/`），因此该开关本身不改变路径解析，只在 frozen 判定顺序上有意义
-- **日志位置**：源码版 `source-code/logs/comfyui-box_<YYYYMMDD_HHMMSS>.log`；发布版 `<安装根>\logs\...`。
+- ~~`main.py` 的 `SIMULATE_FROZEN` 开关~~ 已删除：它算出的路径与开发分支完全相同，只在日志里说谎，容易误导排障。判断"是否打包"只看 `sys.frozen`。
+- **日志位置**：源码版 `source-code/run/<env>/logs/comfyui-box_<YYYYMMDD_HHMMSS>.log`（prod 为 `source-code/logs/`）；发布版 `<安装根>\logs\...`。
   - 目录由 `src/utils/paths.py` 的 `get_log_dir()`（运行数据根下的 `logs/`，运行数据根默认是项目根）决定，`src/utils/logger.py:415-417` 调用；写入用自定义 `DateRotatingFileHandler`（`logger.py:258`、`:455`）
   - 运行数据根可用设置 `storage.runtimeDataDir` 覆盖（设置页“运行数据目录”）；项目目录不可写时降级到 `%TEMP%\Comfyui-Box\runtime-data`，并在设置页告警
   - 缓存（`cache/`）与 WebView2 用户数据（`webview2/`）与日志同源，均在运行数据根下；旧 `<用户数据根>/logs|cache` 原地保留，不删除、不搬迁

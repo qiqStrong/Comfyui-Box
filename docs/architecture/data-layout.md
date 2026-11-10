@@ -52,6 +52,8 @@
 
 - 发布版（onedir）：`<exe 所在安装根>\`
 - 源码版：`source-code\`
+- dev / test 环境额外追加 `run\<env>\` 子目录（`run\dev`、`run\test`），
+  prod 不加子目录，保持原路径不变。
 
 ```
 <运行数据根>\
@@ -72,22 +74,39 @@
 
 ### 2.3 系统级资源
 
-`dist/`、`backend/`、内置 MinGit、`models/nsfw.onnx`、`default_config.json`、`version.json`
-随安装包分发；`version.json` 在打包时放入 `_internal/`，离线也能展示当前构建的更新说明。
+统一放在 `source-code/resource/`（随安装包分发，纳入版本控制）：
+
+```
+resource\
+├── img\logo\      icon.ico · icon.png · app-icon.png · favicon.ico
+├── img\icons\     平台图标（tg / github / app 设计备选）
+├── img\qr\        赞助与社群二维码
+├── img\avatars\   推荐关注头像
+├── models\        nsfw.onnx
+└── config\        deploy.json · default_config.json · modules.json
+                   lora_config.json · folder_shortcuts.json · core_nodes.json · presets\
+```
+
+`dist/`、`backend/`、内置 MinGit、`version.json` 随安装包分发；
+`version.json` 在打包时放入 `_internal/`，离线也能展示当前构建的更新说明。
+
+`core_nodes.json`（312 个内置节点定义）是系统资源而非用户数据：优先读
+`<userdata>/data/core_nodes.json`（用户可覆盖），缺失时回退 `resource/config/core_nodes.json`。
 
 ### 2.4 两种运行形态落点
 
 | 数据 | 源码版（`source-code\`） | 发布版（onedir 安装根） |
 | --- | --- | --- |
 | 业务/配置/备份/LoRA | `<userdata>\data|config|backup|lora_data` | 同左（共用同一份） |
-| 日志 | `source-code\logs\` | `<install_root>\logs\` |
-| 缓存 | `source-code\cache\` | `<install_root>\cache\` |
-| WebView2 | `source-code\webview2\` | `<install_root>\webview2\` |
-| 系统资源 | `source-code\dist|backend|tools` | `<install_root>\_internal|tools` |
+| 日志 | `source-code\run\<env>\logs\` | `<install_root>\logs\` |
+| 缓存 | `source-code\run\<env>\cache\` | `<install_root>\cache\` |
+| WebView2 | `source-code\run\<env>\webview2\` | `<install_root>\webview2\` |
+| 系统资源 | `source-code\resource\` | `<install_root>\_internal\resource\` |
 
-> 用户数据只有一份：源码版与发布版都读取同一个 `userdata.location` 指针。
-> 不按 dev/prod 分渠道，也不承诺"测试实例不污染生产数据"的自动隔离；
-> 需要独立数据环境时，由用户在设置页更改数据目录（会同时影响本机所有实例）。
+> 用户数据按**部署环境**分开：`userdata.location`（prod）、`userdata.location.dev`、
+> `userdata.location.test` 三个独立指针，互不影响。
+> 源码运行默认走 dev，打包产物由 `sys.frozen` 强制走 prod，因此开发调试不会碰到
+> 用户真实使用的数据。
 
 ---
 
@@ -122,8 +141,11 @@
 
 ## 四、用户数据根定位
 
-1. 机器级指针 `%LOCALAPPDATA%\Comfyui-Box\userdata.location`（一行纯文本，绝对路径）
-2. 默认目录 `%LOCALAPPDATA%\Comfyui-Box\userdata`
+1. 机器级指针 `%LOCALAPPDATA%\Comfyui-Box\userdata.location<env 后缀>`（一行纯文本，绝对路径）
+   - prod：`userdata.location`
+   - dev：`userdata.location.dev`
+   - test：`userdata.location.test`
+2. 默认目录 `%LOCALAPPDATA%\Comfyui-Box\userdata<env 后缀>`
 3. 默认目录不可写 → `%TEMP%\Comfyui-Box\userdata`，并把原因返回给 UI
 
 指针失效（目录被移动/删除/不可写）时不会静默新建空库：回退默认目录并在界面提示原因。
@@ -132,16 +154,60 @@
 
 ---
 
-## 五、单一用户数据指针（不做 dev/prod 分渠道）
+## 五、部署环境隔离（dev / test / prod）
 
-- 只存在一个 `userdata.location` 指针，源码版与发布版共用同一用户数据根。
-- 设置页更改数据目录会写同一指针，**影响本机所有实例**；这是明确接受的行为。
-- 不提供 `profiles/dev|release` 之类自动隔离；需要独立环境时由用户手动改路径。
-- 单实例锁保持现状：共享用户数据下并行写会冲突，因此不鼓励同时运行多个实例。
+真源：`source-code/resource/config/deploy.json`，唯一读取入口
+`backend/src/core/deploy_env.py`。判定优先级（高 → 低）：
+
+1. `sys.frozen` 为真 → 强制 `prod`（打包产物永远是 prod）
+2. 启动参数 `--env <name>`
+3. 环境变量 `COMFYUI_BOX_ENV`
+4. `deploy.json` 的 `current_env`
+5. 默认 `dev`
+
+配置采用"公共段 + 环境差异段"覆盖：`defaults` 与 `environments.<env>` 深度合并，
+所以新增环境只需补差异项。
+
+| 项 | dev | test | prod |
+| --- | --- | --- | --- |
+| HTTP 端口 | 5002 | 5001 | 5000 |
+| 单实例锁名 | `Comfyui-Box-dev` | `Comfyui-Box-test` | `Comfyui-Box` |
+| AppUserModelID | `Comfyui-Box.Desktop.dev` | `Comfyui-Box.Desktop.test` | `Comfyui-Box.Desktop` |
+| 运行数据子目录 | `run/dev` | `run/test` | 无 |
+| 用户数据指针 | `userdata.location.dev` | `userdata.location.test` | `userdata.location` |
+| 写保护 | 关 | 开 | 关 |
+| 开发版更新源 | 开 | 关 | 关 |
+
+端口为严格模式：被占用时直接弹原生错误框退出，不静默换端口。
+
+`prod` 的文件名、目录名、默认路径与改造前完全一致，**零迁移**。
 
 ---
 
-## 六、迁移时做什么
+## 六、dev / test 假数据
+
+工具：`source-code/scripts/dev_fixtures.py`（仅 dev / test，拒绝 prod）。
+
+```
+python scripts/dev_fixtures.py seed  --env dev     # 生成
+python scripts/dev_fixtures.py clean --env dev     # 清理并还原
+python scripts/dev_fixtures.py status --env dev    # 查看登记情况
+```
+
+产物与约束：
+
+- 所有文件落在 `<数据根>/fixtures/`，`.fixture_manifest.json` 逐条登记。
+- 覆盖既有文件前先备份到 `<数据根>/fixtures/backup/`，`clean` 原样还原；
+  由 fixture 自己创建的文件不备份，`clean` 直接删除。
+- 假 ComfyUI 是独立目录骨架（`main.py` + `comfy/` + `custom_nodes/` + `models/`
+  + `user/default/workflows/`），带一个本地裸仓库当 `origin`，全程离线。
+- 资产库把媒体文件真正放进 `<数据根>/fixtures/library/<分类>/`，由扫描器建索引；
+  图片内嵌 `workflow` PNG 文本块，用于验证元数据解析链路。
+- 不写入真实 ComfyUI 路径，不写入 prod 指针。
+
+---
+
+## 七、迁移时做什么
 
 入口：首启弹窗的"迁移旧数据"、设置页的"迁移到新目录 / 更改目录（迁移当前数据）"。
 
@@ -162,7 +228,7 @@
 
 ---
 
-## 七、设置页
+## 八、设置页
 
 设置 → 数据目录，包含两块：
 
@@ -185,7 +251,7 @@
 
 ---
 
-## 八、WebView2 说明
+## 九、WebView2 说明
 
 - WebView2 的用户数据目录参数只接受**绝对路径**；`get_webview2_dir()` 返回
   `<运行数据根>/webview2` 的绝对路径（`resolve()` 后）。
@@ -197,20 +263,24 @@
 
 ---
 
-## 九、代码入口
+## 十、代码入口
 
 - `backend/src/utils/paths.py`：所有路径的唯一出口
   （`resolve_user_root`、`resolve_runtime_dir`、`get_data_dir`、`get_config_dir`、
   `get_backup_dir`、`get_lora_data_dir`、`get_cache_dir`、`get_log_dir`、
-  `get_webview2_dir`、旧布局候选）。
+  `get_webview2_dir`、`get_resource_*_dir`、旧布局候选）。
+- `backend/src/core/deploy_env.py`：部署环境真源（端口 / 锁名 / AUMID / 运行子目录 /
+  指针后缀 / 写保护 / 数据源开关）。
 - `backend/src/core/userdata/manager.py`：状态、首启初始化、迁移、运行目录设置、清理。
 - `backend/src/bridge/api.py`：`userdata_*` 桥接 API（含 `userdata_set_runtime_dir`）。
 - 前端：`components/settings/DataStorageSettings.tsx`、`components/settings/DataDirSetupDialog.tsx`。
-- 启动顺序：`main.py` 在单例检查后、任何数据模块初始化前执行 `apply_pending_wipe()`。
+- 启动顺序：`main.py` 先解析 `--env` → 单例检查 → `apply_pending_wipe()` → 数据模块初始化。
 
 ### 自动化测试
 
 - `tests/unit/utils/test_paths_userdata.py`：用户数据根定位、运行数据项目相对路径、
-  设置覆盖、不可写降级、单一指针。
+  设置覆盖、不可写降级、单一指针、prod 路径不变。
 - `tests/unit/core/test_userdata_manager.py`：迁移/回滚/密钥校验、运行目录清理、
   旧 `<userdata>/cache|logs` 保留。
+- `tests/unit/core/test_deploy_env.py`：环境判定优先级、公共段合并、prod 参数不变。
+- `tests/unit/core/test_userdata_settings_carryover.py`：切换数据目录时继承旧配置。
