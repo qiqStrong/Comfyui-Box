@@ -1,0 +1,1979 @@
+{
+  "version": "extracted",
+  "total": 312,
+  "categories": {
+    "frontend": 3,
+    "core": 66,
+    "extras": 73,
+    "api/api node/image/BFL": 4,
+    "api/api node/image/Bria": 2,
+    "api/api node/video/Bria": 1,
+    "api/api node/image/ByteDance": 2,
+    "api/api node/video/ByteDance": 4,
+    "api/api node/audio/ElevenLabs": 8,
+    "api/api node/text/Gemini": 2,
+    "api/api node/image/Gemini": 2,
+    "api/api node/image/Grok": 2,
+    "api/api node/video/Grok": 2,
+    "api/api node/image/HitPaw": 1,
+    "api/api node/video/HitPaw": 1,
+    "api/api node/3d/Tencent": 6,
+    "api/api node/image/Ideogram": 3,
+    "api/api node/video/Kling": 22,
+    "api/api node/image/Kling": 3,
+    "api/api node/video/LTXV": 2,
+    "api/api node/image/Luma": 3,
+    "api/api node/video/Luma": 3,
+    "api/api node/image/Magnific": 5,
+    "api/api node/3d/Meshy": 7,
+    "api/api node/video/MiniMax": 4,
+    "api/api node/video/Moonvalley Marey": 3,
+    "api/api node/image/OpenAI": 3,
+    "api/api node/text/OpenAI": 3,
+    "api/api node/video/PixVerse": 4,
+    "api/api node/image/Recraft": 15,
+    "api/api node/image/Reve": 3,
+    "api/api node/3d/Rodin": 5,
+    "api/api node/video/Runway": 3,
+    "api/api node/image/Runway": 1,
+    "api/api node/video/Sora": 1,
+    "api/api node/image/Stability AI": 5,
+    "api/api node/audio/Stability AI": 3,
+    "api/api node/image/Topaz": 1,
+    "api/api node/video/Topaz": 1,
+    "api/api node/3d/Tripo": 8,
+    "api/api node/video/Veo": 2,
+    "api/api node/video/Vidu": 13,
+    "api/api node/image/Wan": 2,
+    "api/api node/video/Wan": 3,
+    "api/api node/video/WaveSpeed": 1,
+    "api/api node/image/WaveSpeed": 1
+  },
+  "nodes": {
+    "Reroute": {
+      "class": "RerouteNode",
+      "category": "frontend",
+      "display_name": "Reroute",
+      "description": "Redirects connections to organize workflow layout"
+    },
+    "Note": {
+      "class": "NoteNode",
+      "category": "frontend",
+      "display_name": "Note",
+      "description": "Adds text notes to workflow"
+    },
+    "MarkdownNote": {
+      "class": "MarkdownNoteNode",
+      "category": "frontend",
+      "display_name": "Markdown Note",
+      "description": "Adds markdown formatted notes to workflow"
+    },
+    "KSampler": {
+      "class": "KSampler",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "CheckpointLoaderSimple": {
+      "class": "CheckpointLoaderSimple",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "CLIPTextEncode": {
+      "class": "CLIPTextEncode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "CLIPSetLastLayer": {
+      "class": "CLIPSetLastLayer",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "VAEDecode": {
+      "class": "VAEDecode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "VAEEncode": {
+      "class": "VAEEncode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "VAEEncodeForInpaint": {
+      "class": "VAEEncodeForInpaint",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "VAELoader": {
+      "class": "VAELoader",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "EmptyLatentImage": {
+      "class": "EmptyLatentImage",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "LatentUpscale": {
+      "class": "LatentUpscale",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "LatentUpscaleBy": {
+      "class": "LatentUpscaleBy",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "LatentFromBatch": {
+      "class": "LatentFromBatch",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "RepeatLatentBatch": {
+      "class": "RepeatLatentBatch",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "SaveImage": {
+      "class": "SaveImage",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "PreviewImage": {
+      "class": "PreviewImage",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "LoadImage": {
+      "class": "LoadImage",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "LoadImageMask": {
+      "class": "LoadImageMask",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "LoadImageOutput": {
+      "class": "LoadImageOutput",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "ImageScale": {
+      "class": "ImageScale",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "ImageScaleBy": {
+      "class": "ImageScaleBy",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "ImageInvert": {
+      "class": "ImageInvert",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "ImageBatch": {
+      "class": "ImageBatch",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "ImagePadForOutpaint": {
+      "class": "ImagePadForOutpaint",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "EmptyImage": {
+      "class": "EmptyImage",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "ConditioningAverage": {
+      "class": "ConditioningAverage",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "ConditioningCombine": {
+      "class": "ConditioningCombine",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "ConditioningConcat": {
+      "class": "ConditioningConcat",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "ConditioningSetArea": {
+      "class": "ConditioningSetArea",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "ConditioningSetAreaPercentage": {
+      "class": "ConditioningSetAreaPercentage",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "ConditioningSetAreaStrength": {
+      "class": "ConditioningSetAreaStrength",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "ConditioningSetMask": {
+      "class": "ConditioningSetMask",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "KSamplerAdvanced": {
+      "class": "KSamplerAdvanced",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "SetLatentNoiseMask": {
+      "class": "SetLatentNoiseMask",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "LatentComposite": {
+      "class": "LatentComposite",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "LatentBlend": {
+      "class": "LatentBlend",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "LatentRotate": {
+      "class": "LatentRotate",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "LatentFlip": {
+      "class": "LatentFlip",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "LatentCrop": {
+      "class": "LatentCrop",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "LoraLoader": {
+      "class": "LoraLoader",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "CLIPLoader": {
+      "class": "CLIPLoader",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "UNETLoader": {
+      "class": "UNETLoader",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "DualCLIPLoader": {
+      "class": "DualCLIPLoader",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "CLIPVisionEncode": {
+      "class": "CLIPVisionEncode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "StyleModelApply": {
+      "class": "StyleModelApply",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "unCLIPConditioning": {
+      "class": "unCLIPConditioning",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "ControlNetApply": {
+      "class": "ControlNetApply",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "ControlNetApplyAdvanced": {
+      "class": "ControlNetApplyAdvanced",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "ControlNetLoader": {
+      "class": "ControlNetLoader",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "DiffControlNetLoader": {
+      "class": "DiffControlNetLoader",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "StyleModelLoader": {
+      "class": "StyleModelLoader",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "CLIPVisionLoader": {
+      "class": "CLIPVisionLoader",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "VAEDecodeTiled": {
+      "class": "VAEDecodeTiled",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "VAEEncodeTiled": {
+      "class": "VAEEncodeTiled",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "unCLIPCheckpointLoader": {
+      "class": "unCLIPCheckpointLoader",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "GLIGENLoader": {
+      "class": "GLIGENLoader",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "GLIGENTextBoxApply": {
+      "class": "GLIGENTextBoxApply",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "InpaintModelConditioning": {
+      "class": "InpaintModelConditioning",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "CheckpointLoader": {
+      "class": "CheckpointLoader",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "DiffusersLoader": {
+      "class": "DiffusersLoader",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "LoadLatent": {
+      "class": "LoadLatent",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "SaveLatent": {
+      "class": "SaveLatent",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "ConditioningZeroOut": {
+      "class": "ConditioningZeroOut",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "ConditioningSetTimestepRange": {
+      "class": "ConditioningSetTimestepRange",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "LoraLoaderModelOnly": {
+      "class": "LoraLoaderModelOnly",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "name": {
+      "class": "node_cls",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "schema.node_id": {
+      "class": "node_cls",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\nodes.py",
+      "category": "core"
+    },
+    "node.NodeId": {
+      "class": "node",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_hooks.py",
+      "category": "extras"
+    },
+    "Create": {
+      "class": "Create",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_hooks.py",
+      "note": "extracted from node_list",
+      "category": "extras"
+    },
+    "CreateHookLora": {
+      "class": "CreateHookLora",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_hooks.py",
+      "note": "extracted from node_list",
+      "category": "extras"
+    },
+    "CreateHookLoraModelOnly": {
+      "class": "CreateHookLoraModelOnly",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_hooks.py",
+      "note": "extracted from node_list",
+      "category": "extras"
+    },
+    "CreateHookModelAsLora": {
+      "class": "CreateHookModelAsLora",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_hooks.py",
+      "note": "extracted from node_list",
+      "category": "extras"
+    },
+    "CreateHookModelAsLoraModelOnly": {
+      "class": "CreateHookModelAsLoraModelOnly",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_hooks.py",
+      "note": "extracted from node_list",
+      "category": "extras"
+    },
+    "SetHookKeyframes": {
+      "class": "SetHookKeyframes",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_hooks.py",
+      "note": "extracted from node_list",
+      "category": "extras"
+    },
+    "CreateHookKeyframe": {
+      "class": "CreateHookKeyframe",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_hooks.py",
+      "note": "extracted from node_list",
+      "category": "extras"
+    },
+    "CreateHookKeyframesInterpolated": {
+      "class": "CreateHookKeyframesInterpolated",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_hooks.py",
+      "note": "extracted from node_list",
+      "category": "extras"
+    },
+    "CreateHookKeyframesFromFloats": {
+      "class": "CreateHookKeyframesFromFloats",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_hooks.py",
+      "note": "extracted from node_list",
+      "category": "extras"
+    },
+    "Combine": {
+      "class": "Combine",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_hooks.py",
+      "note": "extracted from node_list",
+      "category": "extras"
+    },
+    "CombineHooks": {
+      "class": "CombineHooks",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_hooks.py",
+      "note": "extracted from node_list",
+      "category": "extras"
+    },
+    "CombineHooksFour": {
+      "class": "CombineHooksFour",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_hooks.py",
+      "note": "extracted from node_list",
+      "category": "extras"
+    },
+    "CombineHooksEight": {
+      "class": "CombineHooksEight",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_hooks.py",
+      "note": "extracted from node_list",
+      "category": "extras"
+    },
+    "ConditioningSetProperties": {
+      "class": "ConditioningSetProperties",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_hooks.py",
+      "note": "extracted from node_list",
+      "category": "extras"
+    },
+    "ConditioningSetPropertiesAndCombine": {
+      "class": "ConditioningSetPropertiesAndCombine",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_hooks.py",
+      "note": "extracted from node_list",
+      "category": "extras"
+    },
+    "PairConditioningSetProperties": {
+      "class": "PairConditioningSetProperties",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_hooks.py",
+      "note": "extracted from node_list",
+      "category": "extras"
+    },
+    "PairConditioningSetPropertiesAndCombine": {
+      "class": "PairConditioningSetPropertiesAndCombine",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_hooks.py",
+      "note": "extracted from node_list",
+      "category": "extras"
+    },
+    "ConditioningSetDefaultAndCombine": {
+      "class": "ConditioningSetDefaultAndCombine",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_hooks.py",
+      "note": "extracted from node_list",
+      "category": "extras"
+    },
+    "PairConditioningSetDefaultAndCombine": {
+      "class": "PairConditioningSetDefaultAndCombine",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_hooks.py",
+      "note": "extracted from node_list",
+      "category": "extras"
+    },
+    "PairConditioningCombine": {
+      "class": "PairConditioningCombine",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_hooks.py",
+      "note": "extracted from node_list",
+      "category": "extras"
+    },
+    "SetClipHooks": {
+      "class": "SetClipHooks",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_hooks.py",
+      "note": "extracted from node_list",
+      "category": "extras"
+    },
+    "ConditioningTimestepsRange": {
+      "class": "ConditioningTimestepsRange",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_hooks.py",
+      "note": "extracted from node_list",
+      "category": "extras"
+    },
+    "LoraLoaderBypass": {
+      "class": "LoraLoaderBypass",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_lora_debug.py",
+      "category": "extras"
+    },
+    "LoraLoaderBypassModelOnly": {
+      "class": "LoraLoaderBypassModelOnly",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_lora_debug.py",
+      "category": "extras"
+    },
+    "LTXVLatentUpsampler": {
+      "class": "LTXVLatentUpsampler",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_lt_upsampler.py",
+      "category": "extras"
+    },
+    "ModelSamplingDiscrete": {
+      "class": "ModelSamplingDiscrete",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_model_advanced.py",
+      "category": "extras"
+    },
+    "ModelSamplingContinuousEDM": {
+      "class": "ModelSamplingContinuousEDM",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_model_advanced.py",
+      "category": "extras"
+    },
+    "ModelSamplingContinuousV": {
+      "class": "ModelSamplingContinuousV",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_model_advanced.py",
+      "category": "extras"
+    },
+    "ModelSamplingStableCascade": {
+      "class": "ModelSamplingStableCascade",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_model_advanced.py",
+      "category": "extras"
+    },
+    "ModelSamplingSD3": {
+      "class": "ModelSamplingSD3",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_model_advanced.py",
+      "category": "extras"
+    },
+    "ModelSamplingAuraFlow": {
+      "class": "ModelSamplingAuraFlow",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_model_advanced.py",
+      "category": "extras"
+    },
+    "ModelSamplingFlux": {
+      "class": "ModelSamplingFlux",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_model_advanced.py",
+      "category": "extras"
+    },
+    "RescaleCFG": {
+      "class": "RescaleCFG",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_model_advanced.py",
+      "category": "extras"
+    },
+    "ModelComputeDtype": {
+      "class": "ModelComputeDtype",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_model_advanced.py",
+      "category": "extras"
+    },
+    "ModelMergeSimple": {
+      "class": "ModelMergeSimple",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_model_merging.py",
+      "category": "extras"
+    },
+    "ModelMergeBlocks": {
+      "class": "ModelMergeBlocks",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_model_merging.py",
+      "category": "extras"
+    },
+    "ModelMergeSubtract": {
+      "class": "ModelSubtract",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_model_merging.py",
+      "category": "extras"
+    },
+    "ModelMergeAdd": {
+      "class": "ModelAdd",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_model_merging.py",
+      "category": "extras"
+    },
+    "CheckpointSave": {
+      "class": "CheckpointSave",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_model_merging.py",
+      "category": "extras"
+    },
+    "CLIPMergeSimple": {
+      "class": "CLIPMergeSimple",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_model_merging.py",
+      "category": "extras"
+    },
+    "CLIPMergeSubtract": {
+      "class": "CLIPSubtract",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_model_merging.py",
+      "category": "extras"
+    },
+    "CLIPMergeAdd": {
+      "class": "CLIPAdd",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_model_merging.py",
+      "category": "extras"
+    },
+    "CLIPSave": {
+      "class": "CLIPSave",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_model_merging.py",
+      "category": "extras"
+    },
+    "VAESave": {
+      "class": "VAESave",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_model_merging.py",
+      "category": "extras"
+    },
+    "ModelSave": {
+      "class": "ModelSave",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_model_merging.py",
+      "category": "extras"
+    },
+    "ModelMergeSD1": {
+      "class": "ModelMergeSD1",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_model_merging_model_specific.py",
+      "category": "extras"
+    },
+    "ModelMergeSD2": {
+      "class": "ModelMergeSD1",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_model_merging_model_specific.py",
+      "category": "extras"
+    },
+    "ModelMergeSDXL": {
+      "class": "ModelMergeSDXL",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_model_merging_model_specific.py",
+      "category": "extras"
+    },
+    "ModelMergeSD3_2B": {
+      "class": "ModelMergeSD3_2B",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_model_merging_model_specific.py",
+      "category": "extras"
+    },
+    "ModelMergeAuraflow": {
+      "class": "ModelMergeAuraflow",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_model_merging_model_specific.py",
+      "category": "extras"
+    },
+    "ModelMergeFlux1": {
+      "class": "ModelMergeFlux1",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_model_merging_model_specific.py",
+      "category": "extras"
+    },
+    "ModelMergeSD35_Large": {
+      "class": "ModelMergeSD35_Large",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_model_merging_model_specific.py",
+      "category": "extras"
+    },
+    "ModelMergeMochiPreview": {
+      "class": "ModelMergeMochiPreview",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_model_merging_model_specific.py",
+      "category": "extras"
+    },
+    "ModelMergeLTXV": {
+      "class": "ModelMergeLTXV",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_model_merging_model_specific.py",
+      "category": "extras"
+    },
+    "ModelMergeCosmos7B": {
+      "class": "ModelMergeCosmos7B",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_model_merging_model_specific.py",
+      "category": "extras"
+    },
+    "ModelMergeCosmos14B": {
+      "class": "ModelMergeCosmos14B",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_model_merging_model_specific.py",
+      "category": "extras"
+    },
+    "ModelMergeWAN2_1": {
+      "class": "ModelMergeWAN2_1",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_model_merging_model_specific.py",
+      "category": "extras"
+    },
+    "ModelMergeCosmosPredict2_2B": {
+      "class": "ModelMergeCosmosPredict2_2B",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_model_merging_model_specific.py",
+      "category": "extras"
+    },
+    "ModelMergeCosmosPredict2_14B": {
+      "class": "ModelMergeCosmosPredict2_14B",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_model_merging_model_specific.py",
+      "category": "extras"
+    },
+    "ModelMergeQwenImage": {
+      "class": "ModelMergeQwenImage",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_model_merging_model_specific.py",
+      "category": "extras"
+    },
+    "ModelPatchLoader": {
+      "class": "ModelPatchLoader",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_model_patch.py",
+      "category": "extras"
+    },
+    "QwenImageDiffsynthControlnet": {
+      "class": "QwenImageDiffsynthControlnet",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_model_patch.py",
+      "category": "extras"
+    },
+    "ZImageFunControlnet": {
+      "class": "ZImageFunControlnet",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_model_patch.py",
+      "category": "extras"
+    },
+    "USOStyleReference": {
+      "class": "USOStyleReference",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_model_patch.py",
+      "category": "extras"
+    },
+    "PreviewAny": {
+      "class": "PreviewAny",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_preview_any.py",
+      "category": "extras"
+    },
+    "ImageOnlyCheckpointLoader": {
+      "class": "ImageOnlyCheckpointLoader",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_video_model.py",
+      "category": "extras"
+    },
+    "SVD_img2vid_Conditioning": {
+      "class": "SVD_img2vid_Conditioning",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_video_model.py",
+      "category": "extras"
+    },
+    "VideoLinearCFGGuidance": {
+      "class": "VideoLinearCFGGuidance",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_video_model.py",
+      "category": "extras"
+    },
+    "VideoTriangleCFGGuidance": {
+      "class": "VideoTriangleCFGGuidance",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_video_model.py",
+      "category": "extras"
+    },
+    "ImageOnlyCheckpointSave": {
+      "class": "ImageOnlyCheckpointSave",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_video_model.py",
+      "category": "extras"
+    },
+    "ConditioningSetAreaPercentageVideo": {
+      "class": "ConditioningSetAreaPercentageVideo",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_video_model.py",
+      "category": "extras"
+    },
+    "WebcamCapture": {
+      "class": "WebcamCapture",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_extras\\nodes_webcam.py",
+      "category": "extras"
+    },
+    "FluxProUltraImageNode": {
+      "class": "FluxProUltraImageNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_bfl.py",
+      "display_name": "Flux 1.1 [pro] Ultra Image",
+      "category": "api/api node/image/BFL",
+      "description": "Generates images using Flux Pro 1.1 Ultra via api based on prompt and resolution."
+    },
+    "FluxProExpandNode": {
+      "class": "FluxProExpandNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_bfl.py",
+      "display_name": "Flux.1 Expand Image",
+      "category": "api/api node/image/BFL",
+      "description": "Outpaints image based on prompt."
+    },
+    "FluxProFillNode": {
+      "class": "FluxProFillNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_bfl.py",
+      "display_name": "Flux.1 Fill Image",
+      "category": "api/api node/image/BFL",
+      "description": "Inpaints image based on mask and prompt."
+    },
+    "Flux2ProImageNode": {
+      "class": "Flux2ProImageNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_bfl.py",
+      "display_name": "Flux2ProImageNode",
+      "category": "api/api node/image/BFL",
+      "description": "Generates images synchronously based on prompt and resolution."
+    },
+    "BriaImageEditNode": {
+      "class": "BriaImageEditNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_bria.py",
+      "display_name": "Bria FIBO Image Edit",
+      "category": "api/api node/image/Bria",
+      "description": "Edit images using Bria latest model"
+    },
+    "BriaRemoveImageBackground": {
+      "class": "BriaRemoveImageBackground",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_bria.py",
+      "display_name": "Bria Remove Image Background",
+      "category": "api/api node/image/Bria",
+      "description": "Remove the background from an image using Bria RMBG 2.0."
+    },
+    "BriaRemoveVideoBackground": {
+      "class": "BriaRemoveVideoBackground",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_bria.py",
+      "display_name": "Bria Remove Video Background",
+      "category": "api/api node/video/Bria",
+      "description": "Remove the background from a video using Bria. "
+    },
+    "ByteDanceImageNode": {
+      "class": "ByteDanceImageNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_bytedance.py",
+      "display_name": "ByteDance Image",
+      "category": "api/api node/image/ByteDance",
+      "description": "Generate images using ByteDance models via api based on prompt"
+    },
+    "ByteDanceSeedreamNode": {
+      "class": "ByteDanceSeedreamNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_bytedance.py",
+      "display_name": "ByteDance Seedream 4.5 & 5.0",
+      "category": "api/api node/image/ByteDance",
+      "description": "Unified text-to-image generation and precise single-sentence editing at up to 4K resolution."
+    },
+    "ByteDanceTextToVideoNode": {
+      "class": "ByteDanceTextToVideoNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_bytedance.py",
+      "display_name": "ByteDance Text to Video",
+      "category": "api/api node/video/ByteDance",
+      "description": "Generate video using ByteDance models via api based on prompt"
+    },
+    "ByteDanceImageToVideoNode": {
+      "class": "ByteDanceImageToVideoNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_bytedance.py",
+      "display_name": "ByteDance Image to Video",
+      "category": "api/api node/video/ByteDance",
+      "description": "Generate video using ByteDance models via api based on image and prompt"
+    },
+    "ByteDanceFirstLastFrameNode": {
+      "class": "ByteDanceFirstLastFrameNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_bytedance.py",
+      "display_name": "ByteDance First-Last-Frame to Video",
+      "category": "api/api node/video/ByteDance",
+      "description": "Generate video using prompt and first and last frames."
+    },
+    "ByteDanceImageReferenceNode": {
+      "class": "ByteDanceImageReferenceNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_bytedance.py",
+      "display_name": "ByteDance Reference Images to Video",
+      "category": "api/api node/video/ByteDance",
+      "description": "Generate video using prompt and reference images."
+    },
+    "ElevenLabsSpeechToText": {
+      "class": "ElevenLabsSpeechToText",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_elevenlabs.py",
+      "display_name": "ElevenLabs Speech to Text",
+      "category": "api/api node/audio/ElevenLabs",
+      "description": "Transcribe audio to text. "
+    },
+    "ElevenLabsVoiceSelector": {
+      "class": "ElevenLabsVoiceSelector",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_elevenlabs.py",
+      "display_name": "ElevenLabs Voice Selector",
+      "category": "api/api node/audio/ElevenLabs",
+      "description": "Select a predefined ElevenLabs voice for text-to-speech generation."
+    },
+    "ElevenLabsTextToSpeech": {
+      "class": "ElevenLabsTextToSpeech",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_elevenlabs.py",
+      "display_name": "ElevenLabs Text to Speech",
+      "category": "api/api node/audio/ElevenLabs",
+      "description": "Convert text to speech."
+    },
+    "ElevenLabsAudioIsolation": {
+      "class": "ElevenLabsAudioIsolation",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_elevenlabs.py",
+      "display_name": "ElevenLabs Voice Isolation",
+      "category": "api/api node/audio/ElevenLabs",
+      "description": "Remove background noise from audio, isolating vocals or speech."
+    },
+    "ElevenLabsTextToSoundEffects": {
+      "class": "ElevenLabsTextToSoundEffects",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_elevenlabs.py",
+      "display_name": "ElevenLabs Text to Sound Effects",
+      "category": "api/api node/audio/ElevenLabs",
+      "description": "Generate sound effects from text descriptions."
+    },
+    "ElevenLabsInstantVoiceClone": {
+      "class": "ElevenLabsInstantVoiceClone",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_elevenlabs.py",
+      "display_name": "ElevenLabs Instant Voice Clone",
+      "category": "api/api node/audio/ElevenLabs",
+      "description": "Create a cloned voice from audio samples. "
+    },
+    "ElevenLabsSpeechToSpeech": {
+      "class": "ElevenLabsSpeechToSpeech",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_elevenlabs.py",
+      "display_name": "ElevenLabs Speech to Speech",
+      "category": "api/api node/audio/ElevenLabs",
+      "description": "Transform speech from one voice to another while preserving the original content and emotion."
+    },
+    "ElevenLabsTextToDialogue": {
+      "class": "ElevenLabsTextToDialogue",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_elevenlabs.py",
+      "display_name": "ElevenLabs Text to Dialogue",
+      "category": "api/api node/audio/ElevenLabs",
+      "description": "Generate multi-speaker dialogue from text. Each dialogue entry has its own text and voice."
+    },
+    "GeminiNode": {
+      "class": "GeminiImage",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_gemini.py",
+      "display_name": "Google Gemini",
+      "category": "api/api node/text/Gemini",
+      "description": "Generate text responses with Google's Gemini AI model. "
+    },
+    "GeminiInputFiles": {
+      "class": "GeminiInputFiles",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_gemini.py",
+      "display_name": "Gemini Input Files",
+      "category": "api/api node/text/Gemini",
+      "description": "Loads and prepares input files to include as inputs for Gemini LLM nodes. "
+    },
+    "GeminiImage2Node": {
+      "class": "GeminiImage2",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_gemini.py",
+      "display_name": "Nano Banana Pro (Google Gemini Image)",
+      "category": "api/api node/image/Gemini",
+      "description": "Generate or edit images synchronously via Google Vertex API."
+    },
+    "GeminiNanoBanana2": {
+      "class": "GeminiNanoBanana2",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_gemini.py",
+      "display_name": "Nano Banana 2",
+      "category": "api/api node/image/Gemini",
+      "description": "Generate or edit images synchronously via Google Vertex API."
+    },
+    "GrokImageNode": {
+      "class": "GrokImageNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_grok.py",
+      "display_name": "Grok Image",
+      "category": "api/api node/image/Grok",
+      "description": "Generate images using Grok based on a text prompt"
+    },
+    "GrokImageEditNode": {
+      "class": "GrokImageEditNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_grok.py",
+      "display_name": "Grok Image Edit",
+      "category": "api/api node/image/Grok",
+      "description": "Modify an existing image based on a text prompt"
+    },
+    "GrokVideoNode": {
+      "class": "GrokVideoNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_grok.py",
+      "display_name": "Grok Video",
+      "category": "api/api node/video/Grok",
+      "description": "Generate video from a prompt or an image"
+    },
+    "GrokVideoEditNode": {
+      "class": "GrokVideoEditNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_grok.py",
+      "display_name": "Grok Video Edit",
+      "category": "api/api node/video/Grok",
+      "description": "Edit an existing video based on a text prompt."
+    },
+    "HitPawGeneralImageEnhance": {
+      "class": "HitPawGeneralImageEnhance",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_hitpaw.py",
+      "display_name": "HitPaw General Image Enhance",
+      "category": "api/api node/image/HitPaw",
+      "description": "Upscale low-resolution images to super-resolution, eliminate artifacts and noise. "
+    },
+    "HitPawVideoEnhance": {
+      "class": "HitPawVideoEnhance",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_hitpaw.py",
+      "display_name": "HitPaw Video Enhance",
+      "category": "api/api node/video/HitPaw",
+      "description": "Upscale low-resolution videos to high resolution, eliminate artifacts and noise. "
+    },
+    "TencentTextToModelNode": {
+      "class": "TencentTextToModelNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_hunyuan3d.py",
+      "display_name": "Hunyuan3D: Text to Model",
+      "category": "api/api node/3d/Tencent",
+      "description": "Perform UV unfolding on a 3D model to generate UV texture. "
+    },
+    "TencentImageToModelNode": {
+      "class": "TencentImageToModelNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_hunyuan3d.py",
+      "display_name": "Hunyuan3D: Image(s) to Model",
+      "category": "api/api node/3d/Tencent",
+      "description": "Perform UV unfolding on a 3D model to generate UV texture. "
+    },
+    "TencentModelTo3DUVNode": {
+      "class": "TencentModelTo3DUVNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_hunyuan3d.py",
+      "display_name": "Hunyuan3D: Model to UV",
+      "category": "api/api node/3d/Tencent",
+      "description": "Perform UV unfolding on a 3D model to generate UV texture. "
+    },
+    "Tencent3DTextureEditNode": {
+      "class": "Tencent3DTextureEditNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_hunyuan3d.py",
+      "display_name": "Hunyuan3D: 3D Texture Edit",
+      "category": "api/api node/3d/Tencent",
+      "description": "After inputting the 3D model, perform 3D model texture redrawing."
+    },
+    "Tencent3DPartNode": {
+      "class": "Tencent3DPartNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_hunyuan3d.py",
+      "display_name": "Hunyuan3D: 3D Part",
+      "category": "api/api node/3d/Tencent",
+      "description": "Automatically perform component identification and generation based on the model structure."
+    },
+    "TencentSmartTopologyNode": {
+      "class": "TencentSmartTopologyNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_hunyuan3d.py",
+      "display_name": "Hunyuan3D: Smart Topology",
+      "category": "api/api node/3d/Tencent",
+      "description": "Perform smart retopology on a 3D model. "
+    },
+    "IdeogramV1": {
+      "class": "IdeogramV1",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_ideogram.py",
+      "display_name": "Ideogram V1",
+      "category": "api/api node/image/Ideogram",
+      "description": "Generates images using the Ideogram V1 model."
+    },
+    "IdeogramV2": {
+      "class": "IdeogramV2",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_ideogram.py",
+      "display_name": "Ideogram V2",
+      "category": "api/api node/image/Ideogram",
+      "description": "Generates images using the Ideogram V2 model."
+    },
+    "IdeogramV3": {
+      "class": "IdeogramV3",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_ideogram.py",
+      "display_name": "Ideogram V3",
+      "category": "api/api node/image/Ideogram",
+      "description": "Generates images using the Ideogram V3 model. "
+    },
+    "KlingCameraControls": {
+      "class": "KlingCameraControls",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_kling.py",
+      "display_name": "Kling Camera Controls",
+      "category": "api/api node/video/Kling",
+      "description": "Allows specifying configuration options for Kling Camera Controls and motion control effects."
+    },
+    "KlingTextToVideoNode": {
+      "class": "KlingTextToVideoNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_kling.py",
+      "display_name": "Kling Text to Video",
+      "category": "api/api node/video/Kling",
+      "description": "Kling Text to Video Node"
+    },
+    "KlingOmniProTextToVideoNode": {
+      "class": "OmniProTextToVideoNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_kling.py",
+      "display_name": "Kling 3.0 Omni Text to Video",
+      "category": "api/api node/video/Kling",
+      "description": "Use text prompts to generate videos with the latest Kling model."
+    },
+    "KlingOmniProFirstLastFrameNode": {
+      "class": "OmniProFirstLastFrameNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_kling.py",
+      "display_name": "Kling 3.0 Omni First-Last-Frame to Video",
+      "category": "api/api node/video/Kling",
+      "description": "Use a start frame, an optional end frame, or reference images with the latest Kling model."
+    },
+    "KlingOmniProImageToVideoNode": {
+      "class": "OmniProImageToVideoNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_kling.py",
+      "display_name": "Kling 3.0 Omni Image to Video",
+      "category": "api/api node/video/Kling",
+      "description": "Use up to 7 reference images to generate a video with the latest Kling model."
+    },
+    "KlingOmniProVideoToVideoNode": {
+      "class": "OmniProVideoToVideoNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_kling.py",
+      "display_name": "Kling 3.0 Omni Video to Video",
+      "category": "api/api node/video/Kling",
+      "description": "Use a video and up to 4 reference images to generate a video with the latest Kling model."
+    },
+    "KlingOmniProEditVideoNode": {
+      "class": "OmniProEditVideoNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_kling.py",
+      "display_name": "Kling 3.0 Omni Edit Video",
+      "category": "api/api node/video/Kling",
+      "description": "Edit an existing video with the latest model from Kling."
+    },
+    "KlingOmniProImageNode": {
+      "class": "OmniProImageNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_kling.py",
+      "display_name": "Kling 3.0 Omni Image",
+      "category": "api/api node/image/Kling",
+      "description": "Create or edit images with the latest model from Kling."
+    },
+    "KlingCameraControlT2VNode": {
+      "class": "KlingCameraControlT2VNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_kling.py",
+      "display_name": "Kling Text to Video (Camera Control)",
+      "category": "api/api node/video/Kling",
+      "description": "Transform text into cinematic videos with professional camera movements that simulate real-world cinematography. Control virtual camera actions including zoom, rotation, pan, tilt, and first-person view, while maintaining focus on your original text."
+    },
+    "KlingImage2VideoNode": {
+      "class": "KlingImage2VideoNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_kling.py",
+      "display_name": "Kling Image(First Frame) to Video",
+      "category": "api/api node/video/Kling",
+      "description": "Transform still images into cinematic videos with professional camera movements that simulate real-world cinematography. Control virtual camera actions including zoom, rotation, pan, tilt, and first-person view, while maintaining focus on your original image."
+    },
+    "KlingCameraControlI2VNode": {
+      "class": "KlingCameraControlI2VNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_kling.py",
+      "display_name": "Kling Image to Video (Camera Control)",
+      "category": "api/api node/video/Kling",
+      "description": "Transform still images into cinematic videos with professional camera movements that simulate real-world cinematography. Control virtual camera actions including zoom, rotation, pan, tilt, and first-person view, while maintaining focus on your original image."
+    },
+    "KlingStartEndFrameNode": {
+      "class": "KlingStartEndFrameNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_kling.py",
+      "display_name": "Kling Start-End Frame to Video",
+      "category": "api/api node/video/Kling",
+      "description": "Generate a video sequence that transitions between your provided start and end images. The node creates all frames in between, producing a smooth transformation from the first frame to the last."
+    },
+    "KlingVideoExtendNode": {
+      "class": "KlingVideoExtendNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_kling.py",
+      "display_name": "Kling Video Extend",
+      "category": "api/api node/video/Kling",
+      "description": "Kling Video Extend Node. Extend videos made by other Kling nodes. The video_id is created by using other Kling Nodes."
+    },
+    "KlingDualCharacterVideoEffectNode": {
+      "class": "KlingDualCharacterVideoEffectNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_kling.py",
+      "display_name": "Kling Dual Character Video Effects",
+      "category": "api/api node/video/Kling",
+      "description": "Achieve different special effects when generating a video based on the effect_scene. First image will be positioned on left side, second on right side of the composite."
+    },
+    "KlingSingleImageVideoEffectNode": {
+      "class": "KlingSingleImageVideoEffectNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_kling.py",
+      "display_name": "Kling Video Effects",
+      "category": "api/api node/video/Kling",
+      "description": "Achieve different special effects when generating a video based on the effect_scene."
+    },
+    "KlingLipSyncAudioToVideoNode": {
+      "class": "KlingLipSyncAudioToVideoNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_kling.py",
+      "display_name": "Kling Lip Sync Video with Audio",
+      "category": "api/api node/video/Kling",
+      "description": "Kling Lip Sync Audio to Video Node. Syncs mouth movements in a video file to the audio content of an audio file. When using, ensure that the audio contains clearly distinguishable vocals and that the video contains a distinct face. The audio file should not be larger than 5MB. The video file should not be larger than 100MB, should have height/width between 720px and 1920px, and should be between 2s and 10s in length."
+    },
+    "KlingLipSyncTextToVideoNode": {
+      "class": "KlingLipSyncTextToVideoNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_kling.py",
+      "display_name": "Kling Lip Sync Video with Text",
+      "category": "api/api node/video/Kling",
+      "description": "Kling Lip Sync Text to Video Node. Syncs mouth movements in a video file to a text prompt. The video file should not be larger than 100MB, should have height/width between 720px and 1920px, and should be between 2s and 10s in length."
+    },
+    "KlingVirtualTryOnNode": {
+      "class": "KlingVirtualTryOnNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_kling.py",
+      "display_name": "Kling Virtual Try On",
+      "category": "api/api node/image/Kling",
+      "description": "Kling Virtual Try On Node. Input a human image and a cloth image to try on the cloth on the human. You can merge multiple clothing item pictures into one image with a white background."
+    },
+    "KlingImageGenerationNode": {
+      "class": "KlingImageGenerationNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_kling.py",
+      "display_name": "Kling 3.0 Image",
+      "category": "api/api node/image/Kling",
+      "description": "Kling Image Generation Node. Generate an image from a text prompt with an optional reference image."
+    },
+    "KlingTextToVideoWithAudio": {
+      "class": "TextToVideoWithAudio",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_kling.py",
+      "display_name": "Kling 2.6 Text to Video with Audio",
+      "category": "api/api node/video/Kling",
+      "description": "Generate videos with Kling V3. "
+    },
+    "KlingImageToVideoWithAudio": {
+      "class": "ImageToVideoWithAudio",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_kling.py",
+      "display_name": "Kling 2.6 Image(First Frame) to Video with Audio",
+      "category": "api/api node/video/Kling",
+      "description": "Generate videos with Kling V3. "
+    },
+    "KlingMotionControl": {
+      "class": "MotionControl",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_kling.py",
+      "display_name": "Kling Motion Control",
+      "category": "api/api node/video/Kling",
+      "description": "Generate videos with Kling V3. "
+    },
+    "KlingVideoNode": {
+      "class": "KlingVideoNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_kling.py",
+      "display_name": "Kling 3.0 Video",
+      "category": "api/api node/video/Kling",
+      "description": "Generate videos with Kling V3. "
+    },
+    "KlingFirstLastFrameNode": {
+      "class": "KlingFirstLastFrameNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_kling.py",
+      "display_name": "Kling 3.0 First-Last-Frame to Video",
+      "category": "api/api node/video/Kling",
+      "description": "Generate videos with Kling V3 using first and last frames."
+    },
+    "KlingAvatarNode": {
+      "class": "KlingAvatarNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_kling.py",
+      "display_name": "Kling Avatar 2.0",
+      "category": "api/api node/video/Kling",
+      "description": "Generate broadcast-style digital human videos from a single photo and an audio file."
+    },
+    "LtxvApiTextToVideo": {
+      "class": "TextToVideoNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_ltxv.py",
+      "display_name": "LTXV Text To Video",
+      "category": "api/api node/video/LTXV",
+      "description": "Professional-quality videos with customizable duration and resolution."
+    },
+    "LtxvApiImageToVideo": {
+      "class": "ImageToVideoNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_ltxv.py",
+      "display_name": "LTXV Image To Video",
+      "category": "api/api node/video/LTXV",
+      "description": "Professional-quality videos with customizable duration and resolution based on start image."
+    },
+    "LumaReferenceNode": {
+      "class": "LumaReferenceNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_luma.py",
+      "display_name": "Luma Reference",
+      "category": "api/api node/image/Luma",
+      "description": "Holds an image and weight for use with Luma Generate Image node."
+    },
+    "LumaConceptsNode": {
+      "class": "LumaConceptsNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_luma.py",
+      "display_name": "Luma Concepts",
+      "category": "api/api node/video/Luma",
+      "description": "Camera Concepts for use with Luma Text to Video and Luma Image to Video nodes."
+    },
+    "LumaImageNode": {
+      "class": "LumaImageGenerationNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_luma.py",
+      "display_name": "Luma Text to Image",
+      "category": "api/api node/image/Luma",
+      "description": "Generates images synchronously based on prompt and aspect ratio."
+    },
+    "LumaImageModifyNode": {
+      "class": "LumaImageModifyNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_luma.py",
+      "display_name": "Luma Image to Image",
+      "category": "api/api node/image/Luma",
+      "description": "Modifies images synchronously based on prompt and aspect ratio."
+    },
+    "LumaVideoNode": {
+      "class": "LumaTextToVideoGenerationNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_luma.py",
+      "display_name": "Luma Text to Video",
+      "category": "api/api node/video/Luma",
+      "description": "Generates videos synchronously based on prompt and output_size."
+    },
+    "LumaImageToVideoNode": {
+      "class": "LumaImageToVideoGenerationNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_luma.py",
+      "display_name": "Luma Image to Video",
+      "category": "api/api node/video/Luma",
+      "description": "Generates videos synchronously based on prompt, input images, and output_size."
+    },
+    "MagnificImageUpscalerCreativeNode": {
+      "class": "MagnificImageUpscalerCreativeNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_magnific.py",
+      "display_name": "Magnific Image Upscale (Creative)",
+      "category": "api/api node/image/Magnific",
+      "description": "Prompt‑guided enhancement, stylization, and 2x/4x/8x/16x upscaling. "
+    },
+    "MagnificImageUpscalerPreciseV2Node": {
+      "class": "MagnificImageUpscalerPreciseV2Node",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_magnific.py",
+      "display_name": "Magnific Image Upscale (Precise V2)",
+      "category": "api/api node/image/Magnific",
+      "description": "High-fidelity upscaling with fine control over sharpness, grain, and detail. "
+    },
+    "MagnificImageStyleTransferNode": {
+      "class": "MagnificImageStyleTransferNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_magnific.py",
+      "display_name": "Magnific Image Style Transfer",
+      "category": "api/api node/image/Magnific",
+      "description": "Transfer the style from a reference image to your input image."
+    },
+    "MagnificImageRelightNode": {
+      "class": "MagnificImageRelightNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_magnific.py",
+      "display_name": "Magnific Image Relight",
+      "category": "api/api node/image/Magnific",
+      "description": "Relight an image with lighting adjustments and optional reference-based light transfer."
+    },
+    "MagnificImageSkinEnhancerNode": {
+      "class": "MagnificImageSkinEnhancerNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_magnific.py",
+      "display_name": "Magnific Image Skin Enhancer",
+      "category": "api/api node/image/Magnific",
+      "description": "Skin enhancement for portraits with multiple processing modes."
+    },
+    "MeshyTextToModelNode": {
+      "class": "MeshyTextToModelNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_meshy.py",
+      "display_name": "Meshy: Text to Model",
+      "category": "api/api node/3d/Meshy",
+      "description": "Refine a previously created draft model."
+    },
+    "MeshyRefineNode": {
+      "class": "MeshyRefineNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_meshy.py",
+      "display_name": "Meshy: Refine Draft Model",
+      "category": "api/api node/3d/Meshy",
+      "description": "Refine a previously created draft model."
+    },
+    "MeshyImageToModelNode": {
+      "class": "MeshyImageToModelNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_meshy.py",
+      "display_name": "Meshy: Image to Model",
+      "category": "api/api node/3d/Meshy",
+      "description": "Provides a rigged character in standard formats. "
+    },
+    "MeshyMultiImageToModelNode": {
+      "class": "MeshyMultiImageToModelNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_meshy.py",
+      "display_name": "Meshy: Multi-Image to Model",
+      "category": "api/api node/3d/Meshy",
+      "description": "Provides a rigged character in standard formats. "
+    },
+    "MeshyRigModelNode": {
+      "class": "MeshyRigModelNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_meshy.py",
+      "display_name": "Meshy: Rig Model",
+      "category": "api/api node/3d/Meshy",
+      "description": "Provides a rigged character in standard formats. "
+    },
+    "MeshyAnimateModelNode": {
+      "class": "MeshyAnimateModelNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_meshy.py",
+      "display_name": "Meshy: Animate Model",
+      "category": "api/api node/3d/Meshy",
+      "description": "Apply a specific animation action to a previously rigged character."
+    },
+    "MeshyTextureNode": {
+      "class": "MeshyTextureNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_meshy.py",
+      "display_name": "Meshy: Texture Model",
+      "category": "api/api node/3d/Meshy",
+      "description": ""
+    },
+    "MinimaxTextToVideoNode": {
+      "class": "MinimaxTextToVideoNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_minimax.py",
+      "display_name": "MiniMax Text to Video",
+      "category": "api/api node/video/MiniMax",
+      "description": "Generates videos synchronously based on a prompt, and optional parameters."
+    },
+    "MinimaxImageToVideoNode": {
+      "class": "MinimaxImageToVideoNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_minimax.py",
+      "display_name": "MiniMax Image to Video",
+      "category": "api/api node/video/MiniMax",
+      "description": "Generates videos synchronously based on an image and prompt, and optional parameters."
+    },
+    "MinimaxSubjectToVideoNode": {
+      "class": "MinimaxSubjectToVideoNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_minimax.py",
+      "display_name": "MiniMax Subject to Video",
+      "category": "api/api node/video/MiniMax",
+      "description": "Generates videos synchronously based on an image and prompt, and optional parameters."
+    },
+    "MinimaxHailuoVideoNode": {
+      "class": "MinimaxHailuoVideoNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_minimax.py",
+      "display_name": "MiniMax Hailuo Video",
+      "category": "api/api node/video/MiniMax",
+      "description": "Generates videos from prompt, with optional start frame using the new MiniMax Hailuo-02 model."
+    },
+    "MoonvalleyImg2VideoNode": {
+      "class": "MoonvalleyImg2VideoNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_moonvalley.py",
+      "display_name": "Moonvalley Marey Image to Video",
+      "category": "api/api node/video/Moonvalley Marey",
+      "description": "Moonvalley Marey Image to Video Node"
+    },
+    "MoonvalleyVideo2VideoNode": {
+      "class": "MoonvalleyVideo2VideoNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_moonvalley.py",
+      "display_name": "Moonvalley Marey Video to Video",
+      "category": "api/api node/video/Moonvalley Marey",
+      "description": ""
+    },
+    "MoonvalleyTxt2VideoNode": {
+      "class": "MoonvalleyTxt2VideoNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_moonvalley.py",
+      "display_name": "Moonvalley Marey Text to Video",
+      "category": "api/api node/video/Moonvalley Marey",
+      "description": ""
+    },
+    "OpenAIDalle2": {
+      "class": "OpenAIDalle2",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_openai.py",
+      "display_name": "OpenAI DALL·E 2",
+      "category": "api/api node/image/OpenAI",
+      "description": "Generates images synchronously via OpenAI's DALL·E 2 endpoint."
+    },
+    "OpenAIDalle3": {
+      "class": "OpenAIDalle3",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_openai.py",
+      "display_name": "OpenAI DALL·E 3",
+      "category": "api/api node/image/OpenAI",
+      "description": "Generates images synchronously via OpenAI's DALL·E 3 endpoint."
+    },
+    "OpenAIGPTImage1": {
+      "class": "OpenAIGPTImage1",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_openai.py",
+      "display_name": "OpenAI GPT Image 1.5",
+      "category": "api/api node/image/OpenAI",
+      "description": "Generates images synchronously via OpenAI's GPT Image endpoint."
+    },
+    "OpenAIChatNode": {
+      "class": "OpenAIChatNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_openai.py",
+      "display_name": "OpenAI ChatGPT",
+      "category": "api/api node/text/OpenAI",
+      "description": "Generate text responses from an OpenAI model."
+    },
+    "OpenAIInputFiles": {
+      "class": "OpenAIInputFiles",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_openai.py",
+      "display_name": "OpenAI ChatGPT Input Files",
+      "category": "api/api node/text/OpenAI",
+      "description": "Loads and prepares input files (text, pdf, etc.) to include as inputs for the OpenAI Chat Node. The files will be read by the OpenAI model when generating a response. 🛈 TIP: Can be chained together with other OpenAI Input File nodes."
+    },
+    "OpenAIChatConfig": {
+      "class": "OpenAIChatConfig",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_openai.py",
+      "display_name": "OpenAI ChatGPT Advanced Options",
+      "category": "api/api node/text/OpenAI",
+      "description": "Allows specifying advanced configuration options for the OpenAI Chat Nodes."
+    },
+    "PixverseTemplateNode": {
+      "class": "PixverseTemplateNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_pixverse.py",
+      "display_name": "PixVerse Template",
+      "category": "api/api node/video/PixVerse",
+      "description": "Generates videos based on prompt and output_size."
+    },
+    "PixverseTextToVideoNode": {
+      "class": "PixverseTextToVideoNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_pixverse.py",
+      "display_name": "PixVerse Text to Video",
+      "category": "api/api node/video/PixVerse",
+      "description": "Generates videos based on prompt and output_size."
+    },
+    "PixverseImageToVideoNode": {
+      "class": "PixverseImageToVideoNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_pixverse.py",
+      "display_name": "PixVerse Image to Video",
+      "category": "api/api node/video/PixVerse",
+      "description": "Generates videos based on prompt and output_size."
+    },
+    "PixverseTransitionVideoNode": {
+      "class": "PixverseTransitionVideoNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_pixverse.py",
+      "display_name": "PixVerse Transition Video",
+      "category": "api/api node/video/PixVerse",
+      "description": "Generates videos based on prompt and output_size."
+    },
+    "RecraftColorRGB": {
+      "class": "RecraftColorRGBNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_recraft.py",
+      "display_name": "Recraft Color RGB",
+      "category": "api/api node/image/Recraft",
+      "description": "Create Recraft Color by choosing specific RGB values."
+    },
+    "RecraftControls": {
+      "class": "RecraftControlsNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_recraft.py",
+      "display_name": "Recraft Controls",
+      "category": "api/api node/image/Recraft",
+      "description": "Create Recraft Controls for customizing Recraft generation."
+    },
+    "RecraftStyleV3RealisticImage": {
+      "class": "RecraftStyleV3RealisticImageNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_recraft.py",
+      "display_name": "Recraft Style - Realistic Image",
+      "category": "api/api node/image/Recraft",
+      "description": "Select realistic_image style and optional substyle."
+    },
+    "RecraftStyleV3InfiniteStyleLibrary": {
+      "class": "RecraftStyleInfiniteStyleLibrary",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_recraft.py",
+      "display_name": "Recraft Style - Infinite Style Library",
+      "category": "api/api node/image/Recraft",
+      "description": "Choose style based on preexisting UUID from Recraft's Infinite Style Library."
+    },
+    "RecraftCreateStyleNode": {
+      "class": "RecraftCreateStyleNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_recraft.py",
+      "display_name": "Recraft Create Style",
+      "category": "api/api node/image/Recraft",
+      "description": "Create a custom style from reference images. "
+    },
+    "RecraftTextToImageNode": {
+      "class": "RecraftTextToImageNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_recraft.py",
+      "display_name": "Recraft Text to Image",
+      "category": "api/api node/image/Recraft",
+      "description": "Generates images synchronously based on prompt and resolution."
+    },
+    "RecraftImageToImageNode": {
+      "class": "RecraftImageToImageNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_recraft.py",
+      "display_name": "Recraft Image to Image",
+      "category": "api/api node/image/Recraft",
+      "description": "Modify image based on prompt and strength."
+    },
+    "RecraftImageInpaintingNode": {
+      "class": "RecraftImageInpaintingNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_recraft.py",
+      "display_name": "Recraft Image Inpainting",
+      "category": "api/api node/image/Recraft",
+      "description": "Modify image based on prompt and mask."
+    },
+    "RecraftTextToVectorNode": {
+      "class": "RecraftTextToVectorNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_recraft.py",
+      "display_name": "Recraft Text to Vector",
+      "category": "api/api node/image/Recraft",
+      "description": "Generates SVG synchronously based on prompt and resolution."
+    },
+    "RecraftVectorizeImageNode": {
+      "class": "RecraftVectorizeImageNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_recraft.py",
+      "display_name": "Recraft Vectorize Image",
+      "category": "api/api node/image/Recraft",
+      "description": "Generates SVG synchronously from an input image."
+    },
+    "RecraftReplaceBackgroundNode": {
+      "class": "RecraftReplaceBackgroundNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_recraft.py",
+      "display_name": "Recraft Replace Background",
+      "category": "api/api node/image/Recraft",
+      "description": "Replace background on image, based on provided prompt."
+    },
+    "RecraftRemoveBackgroundNode": {
+      "class": "RecraftRemoveBackgroundNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_recraft.py",
+      "display_name": "Recraft Remove Background",
+      "category": "api/api node/image/Recraft",
+      "description": "Remove background from image, and return processed image and mask."
+    },
+    "RecraftCrispUpscaleNode": {
+      "class": "RecraftCrispUpscaleNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_recraft.py",
+      "display_name": "Recraft Crisp Upscale Image",
+      "category": "api/api node/image/Recraft",
+      "description": "Upscale image synchronously.\\n"
+    },
+    "RecraftV4TextToImageNode": {
+      "class": "RecraftV4TextToImageNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_recraft.py",
+      "display_name": "Recraft V4 Text to Image",
+      "category": "api/api node/image/Recraft",
+      "description": "Generates images using Recraft V4 or V4 Pro models."
+    },
+    "RecraftV4TextToVectorNode": {
+      "class": "RecraftV4TextToVectorNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_recraft.py",
+      "display_name": "Recraft V4 Text to Vector",
+      "category": "api/api node/image/Recraft",
+      "description": "Generates SVG using Recraft V4 or V4 Pro models."
+    },
+    "ReveImageCreateNode": {
+      "class": "ReveImageCreateNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_reve.py",
+      "display_name": "Reve Image Create",
+      "category": "api/api node/image/Reve",
+      "description": "Generate images from text descriptions using Reve."
+    },
+    "ReveImageEditNode": {
+      "class": "ReveImageEditNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_reve.py",
+      "display_name": "Reve Image Edit",
+      "category": "api/api node/image/Reve",
+      "description": "Edit images using natural language instructions with Reve."
+    },
+    "ReveImageRemixNode": {
+      "class": "ReveImageRemixNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_reve.py",
+      "display_name": "Reve Image Remix",
+      "category": "api/api node/image/Reve",
+      "description": "Combine reference images with text prompts to create new images using Reve."
+    },
+    "Rodin3D_Regular": {
+      "class": "Rodin3D_Regular",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_rodin.py",
+      "display_name": "Rodin 3D Generate - Regular Generate",
+      "category": "api/api node/3d/Rodin",
+      "description": ""
+    },
+    "Rodin3D_Detail": {
+      "class": "Rodin3D_Detail",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_rodin.py",
+      "display_name": "Rodin 3D Generate - Detail Generate",
+      "category": "api/api node/3d/Rodin",
+      "description": ""
+    },
+    "Rodin3D_Smooth": {
+      "class": "Rodin3D_Smooth",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_rodin.py",
+      "display_name": "Rodin 3D Generate - Smooth Generate",
+      "category": "api/api node/3d/Rodin",
+      "description": ""
+    },
+    "Rodin3D_Sketch": {
+      "class": "Rodin3D_Sketch",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_rodin.py",
+      "display_name": "Rodin 3D Generate - Sketch Generate",
+      "category": "api/api node/3d/Rodin",
+      "description": ""
+    },
+    "Rodin3D_Gen2": {
+      "class": "Rodin3D_Gen2",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_rodin.py",
+      "display_name": "Rodin 3D Generate - Gen-2 Generate",
+      "category": "api/api node/3d/Rodin",
+      "description": ""
+    },
+    "RunwayImageToVideoNodeGen3a": {
+      "class": "RunwayImageToVideoNodeGen3a",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_runway.py",
+      "display_name": "Runway Image to Video (Gen3a Turbo)",
+      "category": "api/api node/video/Runway",
+      "description": "Generate a video from a single starting frame using Gen3a Turbo model. "
+    },
+    "RunwayImageToVideoNodeGen4": {
+      "class": "RunwayImageToVideoNodeGen4",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_runway.py",
+      "display_name": "Runway Image to Video (Gen4 Turbo)",
+      "category": "api/api node/video/Runway",
+      "description": "Generate a video from a single starting frame using Gen4 Turbo model. "
+    },
+    "RunwayFirstLastFrameNode": {
+      "class": "RunwayFirstLastFrameNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_runway.py",
+      "display_name": "Runway First-Last-Frame to Video",
+      "category": "api/api node/video/Runway",
+      "description": "Upload first and last keyframes, draft a prompt, and generate a video. "
+    },
+    "RunwayTextToImageNode": {
+      "class": "RunwayTextToImageNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_runway.py",
+      "display_name": "Runway Text to Image",
+      "category": "api/api node/image/Runway",
+      "description": "Generate an image from a text prompt using Runway's Gen 4 model. "
+    },
+    "OpenAIVideoSora2": {
+      "class": "OpenAIVideoSora2",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_sora.py",
+      "display_name": "OpenAI Sora - Video",
+      "category": "api/api node/video/Sora",
+      "description": "OpenAI video and audio generation."
+    },
+    "StabilityStableImageUltraNode": {
+      "class": "StabilityStableImageUltraNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_stability.py",
+      "display_name": "Stability AI Stable Image Ultra",
+      "category": "api/api node/image/Stability AI",
+      "description": ""
+    },
+    "StabilityStableImageSD_3_5Node": {
+      "class": "StabilityStableImageSD_3_5Node",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_stability.py",
+      "display_name": "Stability AI Stable Diffusion 3.5 Image",
+      "category": "api/api node/image/Stability AI",
+      "description": ""
+    },
+    "StabilityUpscaleConservativeNode": {
+      "class": "StabilityUpscaleConservativeNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_stability.py",
+      "display_name": "Stability AI Upscale Conservative",
+      "category": "api/api node/image/Stability AI",
+      "description": ""
+    },
+    "StabilityUpscaleCreativeNode": {
+      "class": "StabilityUpscaleCreativeNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_stability.py",
+      "display_name": "Stability AI Upscale Creative",
+      "category": "api/api node/image/Stability AI",
+      "description": ""
+    },
+    "StabilityUpscaleFastNode": {
+      "class": "StabilityUpscaleFastNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_stability.py",
+      "display_name": "Stability AI Upscale Fast",
+      "category": "api/api node/image/Stability AI",
+      "description": ""
+    },
+    "StabilityTextToAudio": {
+      "class": "StabilityTextToAudio",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_stability.py",
+      "display_name": "Stability AI Text To Audio",
+      "category": "api/api node/audio/Stability AI",
+      "description": ""
+    },
+    "StabilityAudioToAudio": {
+      "class": "StabilityAudioToAudio",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_stability.py",
+      "display_name": "Stability AI Audio To Audio",
+      "category": "api/api node/audio/Stability AI",
+      "description": ""
+    },
+    "StabilityAudioInpaint": {
+      "class": "StabilityAudioInpaint",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_stability.py",
+      "display_name": "Stability AI Audio Inpaint",
+      "category": "api/api node/audio/Stability AI",
+      "description": ""
+    },
+    "TopazImageEnhance": {
+      "class": "TopazImageEnhance",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_topaz.py",
+      "display_name": "Topaz Image Enhance",
+      "category": "api/api node/image/Topaz",
+      "description": "Industry-standard upscaling and image enhancement."
+    },
+    "TopazVideoEnhance": {
+      "class": "TopazVideoEnhance",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_topaz.py",
+      "display_name": "Topaz Video Enhance",
+      "category": "api/api node/video/Topaz",
+      "description": "Breathe new life into video with powerful upscaling and recovery technology."
+    },
+    "TripoTextToModelNode": {
+      "class": "TripoTextToModelNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_tripo.py",
+      "display_name": "Tripo: Text to Model",
+      "category": "api/api node/3d/Tripo",
+      "description": "Refine a draft model created by v1.4 Tripo models only."
+    },
+    "TripoImageToModelNode": {
+      "class": "TripoImageToModelNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_tripo.py",
+      "display_name": "Tripo: Image to Model",
+      "category": "api/api node/3d/Tripo",
+      "description": "Refine a draft model created by v1.4 Tripo models only."
+    },
+    "TripoMultiviewToModelNode": {
+      "class": "TripoMultiviewToModelNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_tripo.py",
+      "display_name": "Tripo: Multiview to Model",
+      "category": "api/api node/3d/Tripo",
+      "description": "Refine a draft model created by v1.4 Tripo models only."
+    },
+    "TripoTextureNode": {
+      "class": "TripoTextureNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_tripo.py",
+      "display_name": "Tripo: Texture model",
+      "category": "api/api node/3d/Tripo",
+      "description": "Refine a draft model created by v1.4 Tripo models only."
+    },
+    "TripoRefineNode": {
+      "class": "TripoRefineNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_tripo.py",
+      "display_name": "Tripo: Refine Draft model",
+      "category": "api/api node/3d/Tripo",
+      "description": "Refine a draft model created by v1.4 Tripo models only."
+    },
+    "TripoRigNode": {
+      "class": "TripoRigNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_tripo.py",
+      "display_name": "Tripo: Rig model",
+      "category": "api/api node/3d/Tripo",
+      "description": ""
+    },
+    "TripoRetargetNode": {
+      "class": "TripoRetargetNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_tripo.py",
+      "display_name": "Tripo: Retarget rigged model",
+      "category": "api/api node/3d/Tripo",
+      "description": ""
+    },
+    "TripoConversionNode": {
+      "class": "TripoConversionNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_tripo.py",
+      "display_name": "Tripo: Convert model",
+      "category": "api/api node/3d/Tripo",
+      "description": ""
+    },
+    "VeoVideoGenerationNode": {
+      "class": "VeoVideoGenerationNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_veo2.py",
+      "display_name": "Google Veo 2 Video Generation",
+      "category": "api/api node/video/Veo",
+      "description": "Generates videos from text prompts using Google's Veo 2 API"
+    },
+    "Veo3FirstLastFrameNode": {
+      "class": "Veo3FirstLastFrameNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_veo2.py",
+      "display_name": "Google Veo 3 First-Last-Frame to Video",
+      "category": "api/api node/video/Veo",
+      "description": "Generate video using prompt and first and last frames."
+    },
+    "ViduTextToVideoNode": {
+      "class": "ViduTextToVideoNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_vidu.py",
+      "display_name": "Vidu Text To Video Generation",
+      "category": "api/api node/video/Vidu",
+      "description": "Generate video from a text prompt"
+    },
+    "ViduImageToVideoNode": {
+      "class": "ViduImageToVideoNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_vidu.py",
+      "display_name": "Vidu Image To Video Generation",
+      "category": "api/api node/video/Vidu",
+      "description": "Generate video from image and optional prompt"
+    },
+    "ViduReferenceVideoNode": {
+      "class": "ViduReferenceVideoNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_vidu.py",
+      "display_name": "Vidu Reference To Video Generation",
+      "category": "api/api node/video/Vidu",
+      "description": "Generate video from multiple images and a prompt"
+    },
+    "ViduStartEndToVideoNode": {
+      "class": "ViduStartEndToVideoNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_vidu.py",
+      "display_name": "Vidu Start End To Video Generation",
+      "category": "api/api node/video/Vidu",
+      "description": "Generate a video from start and end frames and a prompt"
+    },
+    "Vidu2TextToVideoNode": {
+      "class": "Vidu2TextToVideoNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_vidu.py",
+      "display_name": "Vidu2 Text-to-Video Generation",
+      "category": "api/api node/video/Vidu",
+      "description": "Generate video from a text prompt"
+    },
+    "Vidu2ImageToVideoNode": {
+      "class": "Vidu2ImageToVideoNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_vidu.py",
+      "display_name": "Vidu2 Image-to-Video Generation",
+      "category": "api/api node/video/Vidu",
+      "description": "Generate a video from an image and an optional prompt."
+    },
+    "Vidu2ReferenceVideoNode": {
+      "class": "Vidu2ReferenceVideoNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_vidu.py",
+      "display_name": "Vidu2 Reference-to-Video Generation",
+      "category": "api/api node/video/Vidu",
+      "description": "Generate a video from multiple reference images and a prompt."
+    },
+    "Vidu2StartEndToVideoNode": {
+      "class": "Vidu2StartEndToVideoNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_vidu.py",
+      "display_name": "Vidu2 Start/End Frame-to-Video Generation",
+      "category": "api/api node/video/Vidu",
+      "description": "Generate a video from a start frame, an end frame, and a prompt."
+    },
+    "ViduExtendVideoNode": {
+      "class": "ViduExtendVideoNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_vidu.py",
+      "display_name": "Vidu Video Extension",
+      "category": "api/api node/video/Vidu",
+      "description": "Extend an existing video by generating additional frames."
+    },
+    "ViduMultiFrameVideoNode": {
+      "class": "ViduMultiFrameVideoNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_vidu.py",
+      "display_name": "Vidu Multi-Frame Video Generation",
+      "category": "api/api node/video/Vidu",
+      "description": "Generate a video with multiple keyframe transitions."
+    },
+    "Vidu3TextToVideoNode": {
+      "class": "Vidu3TextToVideoNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_vidu.py",
+      "display_name": "Vidu Q3 Text-to-Video Generation",
+      "category": "api/api node/video/Vidu",
+      "description": "Generate video from a text prompt."
+    },
+    "Vidu3ImageToVideoNode": {
+      "class": "Vidu3ImageToVideoNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_vidu.py",
+      "display_name": "Vidu Q3 Image-to-Video Generation",
+      "category": "api/api node/video/Vidu",
+      "description": "Generate a video from an image and an optional prompt."
+    },
+    "Vidu3StartEndToVideoNode": {
+      "class": "Vidu3StartEndToVideoNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_vidu.py",
+      "display_name": "Vidu Q3 Start/End Frame-to-Video Generation",
+      "category": "api/api node/video/Vidu",
+      "description": "Generate a video from a start frame, an end frame, and a prompt."
+    },
+    "WanTextToImageApi": {
+      "class": "WanTextToImageApi",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_wan.py",
+      "display_name": "Wan Text to Image",
+      "category": "api/api node/image/Wan",
+      "description": "Generates an image based on a text prompt."
+    },
+    "WanImageToImageApi": {
+      "class": "WanImageToImageApi",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_wan.py",
+      "display_name": "Wan Image to Image",
+      "category": "api/api node/image/Wan",
+      "description": "Generates an image from one or two input images and a text prompt. "
+    },
+    "WanTextToVideoApi": {
+      "class": "WanTextToVideoApi",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_wan.py",
+      "display_name": "Wan Text to Video",
+      "category": "api/api node/video/Wan",
+      "description": "Generates a video based on a text prompt."
+    },
+    "WanImageToVideoApi": {
+      "class": "WanImageToVideoApi",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_wan.py",
+      "display_name": "Wan Image to Video",
+      "category": "api/api node/video/Wan",
+      "description": "Generates a video from the first frame and a text prompt."
+    },
+    "WanReferenceVideoApi": {
+      "class": "WanReferenceVideoApi",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_wan.py",
+      "display_name": "Wan Reference to Video",
+      "category": "api/api node/video/Wan",
+      "description": "Use the character and voice from input videos, combined with a prompt, "
+    },
+    "WavespeedFlashVSRNode": {
+      "class": "WavespeedFlashVSRNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_wavespeed.py",
+      "display_name": "FlashVSR Video Upscale",
+      "category": "api/api node/video/WaveSpeed",
+      "description": "Fast, high-quality video upscaler that "
+    },
+    "WavespeedImageUpscaleNode": {
+      "class": "WavespeedImageUpscaleNode",
+      "source": "g:\\ComfyUI_windows_portable\\ComfyUI\\comfy_api_nodes\\nodes_wavespeed.py",
+      "display_name": "WaveSpeed Image Upscale",
+      "category": "api/api node/image/WaveSpeed",
+      "description": "Boost image resolution and quality, upscaling photos to 4K or 8K for sharp, detailed results."
+    }
+  }
+}

@@ -18,7 +18,7 @@ from pathlib import Path
 from typing import Dict, List, Optional, Any, Tuple
 from dataclasses import dataclass, field
 
-from backend.src.utils.paths import get_data_dir, get_cache_dir
+from backend.src.utils.paths import get_data_dir, get_cache_dir, get_resource_config_dir
 from backend.src.utils.logger import app_logger as logger
 
 
@@ -176,10 +176,15 @@ class NodeMapper:
     
     def _load_builtin_nodes(self) -> None:
         """
-        从 data/core_nodes.json 加载内置节点列表
+        加载内置节点列表。
+
+        优先读用户数据目录下的覆盖副本（用户可自行更新），
+        缺失时回退到随安装包发布的系统资源 ``resource/config/core_nodes.json``。
         """
         builtin_nodes_path = get_data_dir() / BUILTIN_NODES_FILE
-        
+        if not builtin_nodes_path.exists():
+            builtin_nodes_path = Path(get_resource_config_dir()) / BUILTIN_NODES_FILE
+
         if not builtin_nodes_path.exists():
             logger.warning(f"内置节点文件不存在: {builtin_nodes_path}")
             return
