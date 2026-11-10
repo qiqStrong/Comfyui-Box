@@ -1,8 +1,8 @@
 {
-  "version": "V1.0.0",
-  "published_at": "2026-11-04T06:34:09Z",
-  "download_url": "https://github.com/qiqStrong/Comfyui-Box/releases/download/v1.0.0/Comfyui-Box-v1.0.0-win64.zip",
-  "file_size": 135691371,
-  "file_hash": "f71dfb4b85cf65aaa3ab49f6ad0ebc4eea2a19878c29195089fe83aaeab8b1d4",
-  "release_notes": "# Comfyui-Box V1.0.0 更新日志\n\n**版本类型**：Stable\n\n## ✨ 主要更新\n\n- **全局更名**：产品名由 ComfyNexus 更名为 Comfyui-Box，窗口标题、托盘、关于页与图标同步更新；内置 Bridge 插件会自动迁移旧安装目录\n- **资产库查看体验**：新增网格卡片视图与影院模式，支持全屏浏览与详情面板自动收起；视频资产可读取内嵌工作流\n- **资产库筛选与分类**：新增类型、星级、时间、模型与排序的二级筛选区；分类树改为内联改名/移动/删除，操作直接作用于真实文件夹；删除资产改走系统回收站\n- **提示词库改版**：改为左侧列表 + 右侧详情，分类树内联操作；支持从资产库一键转入提示词库，并新增生成参数字段\n- **工作流库**：改为紧凑列表 + 常驻详情面板，卡片网格保留为可切换视图\n\n## 🔒 安全与稳定性\n\n- API 密钥改为本机唯一密钥加密存储，桥接层只返回掩码\n- 本机 HTTP 服务收敛静态文件路径，跨域仅放行回环来源\n- 更新包解压拒绝越界成员，官方通道强制校验 SHA256\n\n## 🛠 工程与发布\n\n- 新增前后端 CI 质量门禁（类型检查与单元测试）\n- 版本基线统一为 V1.0.0\n- 构建产物与运行期数据不再纳入版本控制\n"
+  "version": "V1.0.1",
+  "published_at": "2026-11-10T16:14:15Z",
+  "download_url": "https://github.com/qiqStrong/Comfyui-Box/releases/download/v1.0.1/Comfyui-Box-v1.0.1-win64.zip",
+  "file_size": 155577577,
+  "file_hash": "bf4fe88d5dbb09c115fd6d092a2ee9af79fe8111819cebdfec49f143b24c64c9",
+  "release_notes": "# Comfyui-Box V1.0.1 更新日志\n\n**版本类型**：Stable\n\n## ✨ 主要更新\n\n- **部署环境隔离**：新增 dev / test / prod 三套环境真源（`resource/config/deploy.json`），端口（5002 / 5001 / 5000）、单实例锁名、任务栏标识、运行数据目录、用户数据指针全部按环境分开；源码运行默认 dev，打包产物由 `sys.frozen` 强制 prod\n- **数据目录按环境独立**：`userdata.location` 拆为 `userdata.location.dev` / `.test` / `.prod`，开发调试不再触碰正在使用的生产数据；prod 文件名与目录名保持原样，升级零迁移\n- **静态资源统一**：图片、图标、二维码、头像、模型、系统配置全部收口到 `source-code/resource/`，删除 `assets/`、`frontend/public/`、`backend/models/` 三处散落目录\n\n## 🐛 问题修复\n\n- 修复引导弹窗「选择数据保存位置」每次启动重复弹出、选择不生效\n- 修复代理检测弹窗「不再弹出」勾选后仍反复出现（切换数据目录时未继承旧配置）\n- 修复内置节点映射表在全新数据目录下恒为空（改为随包资源并补回退）\n- 修复打包前检查因日志告警写入 stderr 而中断构建\n\n## 🛠 工程与发布\n\n- 新增 dev / test 假数据生成器 `scripts/dev_fixtures.py`，可生成、可清理、拒绝写入 prod\n- 端口改为严格模式：被占用时直接提示并退出，不再静默换端口\n- 移除误导性的 `SIMULATE_FROZEN` 开关，是否打包只看 `sys.frozen`\n"
 }
