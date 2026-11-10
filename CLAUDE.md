@@ -334,6 +334,16 @@ process_manager.start(python_path, comfyui_path, args=None, env_config=None)  # 
 - **首次启动落盘**：用户级数据（资产库、提示词、工作流、AI 对话、密钥、`settings.json`）写入当前环境的数据根；运行级日志/缓存/WebView2 写入上表对应目录。
 - **Git 来源**：仓库内 `backend/MinGit-2.53.0-64-bit/` 不含 `git.exe`（被 `source-code/.gitignore` 的 `*.exe` 忽略），运行期按“内置 MinGit → 系统 Git → 否决”回退（`utils/git_manager.py`）。
 
+### 13. 启动实例的收尾责任（强制）
+
+为验证而启动的应用实例，**谁开的谁关**，验证一结束就收尾，不得留在后台占着窗口和端口。
+
+- **正常关闭优先**：用应用自身的 `closeApp` 流程（窗口关闭 / `WM_CLOSE`），日志里要出现 `[closeApp] 执行完毕`，退出码 0。
+- **强制结束要声明**：正常关闭无效时才 `taskkill`，并在回复里明确写“已强杀、退出码非 0”，不能把强杀说成正常退出。
+- **说“正在运行”前必须现场核实**：用端口监听 + 窗口枚举确认，不能沿用几分钟前的结论。实例被关掉后要主动更正，而不是让用户自己发现。
+- **用户的发布版实例一律不动**：5000 端口、进程名 `Comfyui-Box.exe`。开发实例固定 5002，测试固定 5001，绝不占用 5000。
+- 一次验证只保留**一个**实例；需要换环境时先关旧的再开新的，避免多实例同时写同一份配置。
+
 ## 测试策略
 
 - **前端测试**：Vitest 4 + Testing Library；`npm run test` 是 watch 模式，CI/一次性验证用 `npm run test:run`
