@@ -6,9 +6,16 @@
 import sys
 from pathlib import Path
 import re
+import logging
 
 # 添加项目根目录到 Python 路径
 sys.path.insert(0, str(Path(__file__).parent))
+
+# 预检只验证导入能否成功，不需要运行期日志。
+# 这里先挂一个空处理器，避免 utils.logger 在导入时往 stderr 打
+# 「尚未通过 setup_logger() 初始化」告警——构建脚本开着
+# $ErrorActionPreference = "Stop"，任何 stderr 输出都会被当成致命错误中断打包。
+logging.getLogger("Comfyui-Box").addHandler(logging.NullHandler())
 
 print("=" * 60)
 print("打包前检查")
