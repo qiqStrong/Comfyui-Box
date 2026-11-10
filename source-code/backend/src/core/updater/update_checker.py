@@ -62,10 +62,18 @@ class UpdateChecker:
     def _load_dev_config(self):
         """
         从 dev 文件加载开发配置
-        
+
+        只在 dev 环境且 deploy.json 打开 dev_updates 时才读。prod 下这个文件
+        根本不参与解析——否则用户机器上残留一个 dev 文件就能把发布版的
+        更新源指向别处。
+
         支持格式: https://<token>@github.com/<owner>/<repo>
         例如: https://ghp_xxxx@github.com/qiqStrong/Comfyui-Box_VM
         """
+        from backend.src.core import deploy_env
+
+        if not deploy_env.is_dev_updates_enabled():
+            return
         try:
             from backend.src.utils.paths import get_dev_update_source_file
             dev_file = get_dev_update_source_file()

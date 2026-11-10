@@ -114,14 +114,35 @@ def get_machine_app_dir() -> Path:
     return Path(base) / APP_NAME
 
 
+def _env_suffix() -> str:
+    """
+    当前部署环境的名字后缀。
+
+    prod 返回空串——发布版沿用原文件名与原目录名，升级后数据零迁移；
+    dev / test 返回 ``.dev`` / ``.test``，与 prod 完全隔开。
+
+    函数内导入 deploy_env：本模块被 deploy_env 反过来调用（拿 resource 目录），
+    模块级导入会形成循环。
+    """
+    from backend.src.core import deploy_env
+
+    env = deploy_env.get_env_name()
+    return "" if env == deploy_env.ENV_PROD else f".{env}"
+
+
 def get_userdata_pointer_file() -> Path:
     """机器级指针文件路径（内容为用户数据根的绝对路径，一行纯文本）。"""
-    return get_machine_app_dir() / USERDATA_POINTER_FILENAME
+    return get_machine_app_dir() / f"{USERDATA_POINTER_FILENAME}{_env_suffix()}"
 
 
 def get_default_user_data_root() -> Path:
-    """默认用户数据根：%LOCALAPPDATA%\\Comfyui-Box\\userdata。"""
-    return get_machine_app_dir() / "userdata"
+    """
+    默认用户数据根：prod 为 ``%LOCALAPPDATA%\\Comfyui-Box\\userdata``。
+
+    dev / test 带环境后缀。这不是锦上添花：如果 dev 首次启动落到 prod 的默认目录，
+    开发时的写操作会直接改到生产数据，隔离就形同虚设。
+    """
+    return get_machine_app_dir() / f"userdata{_env_suffix()}"
 
 
 def _is_writable_dir(path: Path) -> bool:
@@ -372,6 +393,14 @@ def _read_runtime_data_override() -> Optional[Path]:
     return candidate.resolve() if candidate.is_absolute() else None
 
 
+def _with_env_runtime_subdir(base: Path) -> Path:
+    """在项目相对的运行数据根下追加环境子目录（prod 不追加，保持现有位置）。"""
+    from backend.src.core import deploy_env
+
+    subdir = deploy_env.get_runtime_subdir()
+    return base / subdir if subdir else base
+
+
 def _reset_runtime_cache() -> None:
     global _resolved_runtime_cache, _resolved_runtime_source_cache, _resolved_runtime_note_cache
     with _resolve_lock:
@@ -417,6 +446,11 @@ def resolve_runtime_dir(override: Optional[str | Path] = None) -> Tuple[Path, st
 
         configured = _read_runtime_data_override()
         base = configured or get_project_root()
+        if configured is None:
+            # 用户没在设置页指定目录时，dev / test 各用自己子目录，
+            # 避免与 prod 的 logs / cache / webview2 混在一起。
+            # prod 的 runtime_subdir 为空，位置保持现状。
+            base = _with_env_runtime_subdir(base)
         if _is_writable_dir(base):
             resolved: Tuple[Path, str, Optional[str]] = (
                 base.resolve(),
@@ -428,7 +462,11 @@ def resolve_runtime_dir(override: Optional[str | Path] = None) -> Tuple[Path, st
                 f"运行数据目录不可写：{base}（安装目录可能位于 Program Files 等只读位置），"
                 "已临时改用系统临时目录；请在设置页“运行数据目录”中指定可写目录"
             )
-            fallback = Path(tempfile.gettempdir()) / APP_NAME / RUNTIME_DATA_FALLBACK_DIRNAME
+            fallback = (
+                Path(tempfile.gettempdir())
+                / APP_NAME
+                / f"{RUNTIME_DATA_FALLBACK_DIRNAME}{_env_suffix()}"
+            )
             if _is_writable_dir(fallback):
                 resolved = (fallback.resolve(), "fallback", note)
             else:

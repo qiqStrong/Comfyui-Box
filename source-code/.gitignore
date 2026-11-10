@@ -220,6 +220,8 @@ frontend/backend/config/plugins/*.json
 /webview2/
 /lora_data/
 /images/
+# 按环境分开的运行数据（dev → run/dev，test → run/test；prod 沿用上方 logs/cache/webview2）
+/run/
 scripts/comfyui_core_nodes.json
 
 # ============================================

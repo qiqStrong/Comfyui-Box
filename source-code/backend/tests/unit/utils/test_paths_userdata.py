@@ -22,7 +22,9 @@ from backend.src.utils import paths  # noqa: E402
 
 @pytest.fixture(autouse=True)
 def _isolate_machine_dirs(monkeypatch, tmp_path):
-    """把 LOCALAPPDATA 与项目根指向临时目录，避免读写真实目录。"""
+    """把 LOCALAPPDATA 与项目根指向临时目录，并固定为 dev 环境。"""
+    from backend.src.core import deploy_env
+
     local = tmp_path / "localappdata"
     local.mkdir(parents=True, exist_ok=True)
     install = tmp_path / "install"
@@ -30,18 +32,38 @@ def _isolate_machine_dirs(monkeypatch, tmp_path):
     monkeypatch.setenv("LOCALAPPDATA", str(local))
     monkeypatch.delenv("APPDATA", raising=False)
     monkeypatch.setattr(paths, "get_project_root", lambda: install)
+    deploy_env.set_env_override("dev")
     paths.reset_user_data_root_cache()
     paths.reset_runtime_dir_cache()
     yield install
+    deploy_env.set_env_override(None)
     paths.reset_user_data_root_cache()
     paths.reset_runtime_dir_cache()
 
 
 def test_default_root_and_source(tmp_path):
-    expected = Path(__import__("os").environ["LOCALAPPDATA"]) / paths.APP_NAME / "userdata"
+    """dev 环境默认根带 .dev 后缀，避免开发时落到 prod 的 userdata。"""
+    expected = Path(__import__("os").environ["LOCALAPPDATA"]) / paths.APP_NAME / "userdata.dev"
     assert paths.get_user_data_root() == expected.resolve()
     assert paths.get_user_data_source() == "default"
     assert paths.get_default_user_data_root() == expected
+
+
+def test_prod_keeps_original_locations(_isolate_machine_dirs):
+    """prod 的文件名与目录名必须一字不改，否则发布版升级后数据会"消失"。"""
+    from backend.src.core import deploy_env
+
+    install = _isolate_machine_dirs
+    deploy_env.set_env_override("prod")
+    try:
+        local = Path(__import__("os").environ["LOCALAPPDATA"]) / paths.APP_NAME
+        assert paths.get_userdata_pointer_file() == local / "userdata.location"
+        assert paths.get_default_user_data_root() == local / "userdata"
+        assert paths.get_log_dir("comfyui") == install / "logs" / "comfyui"
+        assert paths.get_cache_dir("marketplace") == install / "cache" / "marketplace"
+        assert paths.get_webview2_dir() == (install / "webview2").resolve()
+    finally:
+        deploy_env.set_env_override("dev")
 
 
 def test_explicit_override_is_used(tmp_path):
@@ -106,12 +128,12 @@ def test_user_level_dirs_derived_from_root(tmp_path):
 
 
 def test_runtime_dirs_follow_project_relative_paths(_isolate_machine_dirs):
-    """日志/缓存/WebView2 落在项目目录，而不是用户数据根。"""
+    """日志/缓存/WebView2 落在项目目录下的环境子目录，而不是用户数据根。"""
     install = _isolate_machine_dirs
     root = paths.get_user_data_root()
-    assert paths.get_log_dir("comfyui") == install / "logs" / "comfyui"
-    assert paths.get_cache_dir("marketplace") == install / "cache" / "marketplace"
-    assert paths.get_webview2_dir() == (install / "webview2").resolve()
+    assert paths.get_log_dir("comfyui") == install / "run" / "dev" / "logs" / "comfyui"
+    assert paths.get_cache_dir("marketplace") == install / "run" / "dev" / "cache" / "marketplace"
+    assert paths.get_webview2_dir() == (install / "run" / "dev" / "webview2").resolve()
     assert paths.get_runtime_data_source() == "project"
     assert paths.get_runtime_data_resolution_note() is None
     for path in (
@@ -154,16 +176,19 @@ def test_unwritable_project_falls_back_to_temp_with_note(monkeypatch, tmp_path):
 
     root, source, note = paths.resolve_runtime_dir()
     assert source == "fallback"
-    assert root == (fake_temp / paths.APP_NAME / paths.RUNTIME_DATA_FALLBACK_DIRNAME).resolve()
+    assert root == (
+        fake_temp / paths.APP_NAME / f"{paths.RUNTIME_DATA_FALLBACK_DIRNAME}.dev"
+    ).resolve()
     assert note and "运行数据目录不可写" in note
     assert paths.get_machine_app_dir().resolve() not in root.parents
 
 
 def test_single_userdata_pointer_no_profiles(_isolate_machine_dirs):
-    """用户数据只有一个机器级指针，不做 dev/prod 分渠道。"""
+    """用户数据只有一个机器级指针；按环境区分靠文件名后缀，不靠子目录。"""
     assert paths.USERDATA_POINTER_FILENAME == "userdata.location"
     pointer = paths.get_userdata_pointer_file()
     assert pointer.parent == paths.get_machine_app_dir()
+    assert pointer.name == "userdata.location.dev"
     assert "profiles" not in pointer.parts
 
 

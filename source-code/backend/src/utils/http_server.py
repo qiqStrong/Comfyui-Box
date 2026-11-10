@@ -90,6 +90,36 @@ def _resolve_within(base_dir: Path, unsafe_relative: str) -> Optional[Path]:
     return candidate
 
 
+def is_port_available(port: int, host: str = LOOPBACK_HOST) -> bool:
+    """
+    探测端口当前是否可被本进程绑定。
+
+    分两步，因为 Windows 上单靠 bind 判断不可靠（SO_REUSEADDR 允许绑定
+    已被监听的端口，会得出"可用"的错误结论）：
+
+    1. 先 connect：能连上说明已有进程在监听，直接判占用。
+    2. 再 bind：没人监听但被其他方式占着时，bind 会抛 OSError。
+
+    Args:
+        port: 待探测端口
+        host: 监听地址，默认回环
+
+    Returns:
+        bool: True 表示可以绑定
+    """
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as probe:
+        probe.settimeout(0.3)
+        if probe.connect_ex((host, port)) == 0:
+            return False
+
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as binder:
+            binder.bind((host, port))
+    except OSError:
+        return False
+    return True
+
+
 def find_available_port(start_port: int = 5000, max_attempts: int = 100) -> int:
     """
     查找可用端口
@@ -118,39 +148,49 @@ def find_available_port(start_port: int = 5000, max_attempts: int = 100) -> int:
     raise RuntimeError(f"无法在 {start_port}-{start_port + max_attempts} 范围内找到可用端口")
 
 
-def create_server(static_dir: Path, port: int = None) -> 'StaticFileServer':
+def create_server(
+    static_dir: Path,
+    port: Optional[int] = None,
+    strict_port: bool = False,
+) -> 'StaticFileServer':
     """
     创建静态文件服务器
-    
+
     Args:
         static_dir: 静态文件目录（前端构建输出目录）
-        port: 服务器端口（如果为 None，则自动查找可用端口）
-    
+        port: 服务器端口（None 表示从 5000 起自动探测）
+        strict_port: True 表示端口被占用时直接报错，绝不换端口。
+                     部署环境用它把端口固化为环境身份。
+
     Returns:
         StaticFileServer 实例
+
+    Raises:
+        RuntimeError: strict_port 为真且端口已被占用
     """
-    return StaticFileServer(static_dir, port)
+    return StaticFileServer(static_dir, port, strict_port)
 
 
 class StaticFileServer:
     """静态文件服务器"""
     
-    def __init__(self, static_dir: Path, port: int = None):
+    def __init__(
+        self,
+        static_dir: Path,
+        port: Optional[int] = None,
+        strict_port: bool = False,
+    ):
         """
         初始化静态文件服务器
-        
+
         Args:
             static_dir: 静态文件目录（前端构建输出目录）
-            port: 服务器端口（如果为 None，则自动查找可用端口）
+            port: 服务器端口（None 表示自动查找可用端口）
+            strict_port: True 表示端口被占用时报错退出，不自动漂移
         """
         self.static_dir = Path(static_dir)
-        
-        # 如果未指定端口，自动查找可用端口
-        if port is None:
-            self.port = find_available_port()
-        else:
-            self.port = port
-            
+        self.port = self._resolve_port(port, strict_port)
+
         self.app = Flask(__name__)
         self.server = None
         self.server_thread = None
@@ -172,6 +212,28 @@ class StaticFileServer:
         logger.info(f"[HTTP Server] 初始化完成")
         logger.info(f"[HTTP Server] 静态文件目录: {static_dir}")
     
+    def _resolve_port(self, port: Optional[int], strict_port: bool) -> int:
+        """
+        决定最终监听端口。
+
+        严格模式把端口当作环境身份：被占用就报错，而不是悄悄换一个。
+        否则日志写着 5002、实际监听 5003，排查时会误判。
+        """
+        if port is None:
+            return find_available_port()
+
+        if is_port_available(port):
+            return port
+
+        if strict_port:
+            raise RuntimeError(
+                f"端口 {port} 已被占用，当前环境要求固定端口，不会自动改用其他端口。"
+                "请关闭占用该端口的程序后重试。"
+            )
+
+        logger.warning(f"[HTTP Server] 端口 {port} 已被占用，改为自动探测")
+        return find_available_port(port)
+
     def _setup_routes(self):
         """设置路由"""
         

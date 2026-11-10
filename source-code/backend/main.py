@@ -53,12 +53,10 @@ def safe_print(text):
         print(safe_text)
 
 
-# ========== 开发调试开关 ==========
-# 设置为 True 可在开发环境中模拟打包后的行为
-SIMULATE_FROZEN = True
-# ==================================
-
-# 处理 PyInstaller 打包的路径
+# 处理 PyInstaller 打包的路径。
+# 源码运行（dev / test）一律从 source-code/ 起算；打包产物走 _MEIPASS 或 exe 同级。
+# 注意：源码无法模拟打包后的路径行为，环境身份由 core/deploy_env.py 统一判定，
+# 不要再用「模拟 frozen」这类开关——它只会让日志说谎。
 if getattr(sys, 'frozen', False):
     # 在 PyInstaller 打包的 exe 中
     # _MEIPASS 是 PyInstaller 解压临时文件的目录
@@ -66,11 +64,7 @@ if getattr(sys, 'frozen', False):
         base_path = Path(sys._MEIPASS)
     else:
         base_path = Path(sys.executable).parent
-elif SIMULATE_FROZEN:
-    # 模拟打包环境：使用项目根目录（与开发环境相同的路径）
-    base_path = Path(__file__).parent.parent
 else:
-    # 在开发环境中
     base_path = Path(__file__).parent.parent
 
 # 添加项目根目录到 Python 路径
@@ -384,10 +378,29 @@ def migrate_from_internal(logger):
         logger.warning(f"[迁移] 迁移过程出错: {e}")
 
 
+def _show_fatal_message(title: str, message: str) -> None:
+    """
+    启动早期用系统原生对话框告知用户致命错误。
+
+    此时 pywebview 尚未初始化，不能创建窗口。用户双击 exe 启动后如果只看到
+    进程一闪而过，根本不知道发生了什么，所以必须有一个不依赖 GUI 框架的提示。
+    """
+    if sys.platform != "win32":
+        return
+    try:
+        import ctypes
+
+        MB_ICONERROR = 0x10
+        ctypes.windll.user32.MessageBoxW(None, message, title, MB_ICONERROR)
+    except Exception:
+        pass
+
+
 def _apply_runtime_overrides() -> None:
     """
     解析并应用仅本次启动生效的命令行覆盖。
 
+    --env <dev|test|prod>   指定部署环境（打包产物恒为 prod，此参数被忽略）
     --user-data-dir <path>  使用测试数据根（不修改机器级 userdata.location 指针）
     --instance-name <name>  使用独立单实例锁名，允许测试实例与发布版并存
     --test-mode             强制开启只读保护（对真实 ComfyUI 根的写操作显式拒绝）
@@ -395,10 +408,21 @@ def _apply_runtime_overrides() -> None:
     import argparse
 
     parser = argparse.ArgumentParser(add_help=False)
+    parser.add_argument("--env", dest="env", default=None)
     parser.add_argument("--user-data-dir", dest="user_data_dir", default=None)
     parser.add_argument("--instance-name", dest="instance_name", default=None)
     parser.add_argument("--test-mode", dest="test_mode", action="store_true")
     args, _unknown = parser.parse_known_args()
+
+    from backend.src.core import deploy_env
+
+    # 环境必须最先确定：后续的数据根、运行目录、端口都从它派生
+    if args.env:
+        deploy_env.set_env_override(args.env)
+
+    # --test-mode 与环境的 write_guard 是同一件事的两种来源，都收敛到真源
+    if args.test_mode:
+        deploy_env.set_write_guard_override(True)
 
     if args.user_data_dir or args.instance_name or args.test_mode:
         from backend.src.utils.paths import configure_runtime_overrides
@@ -417,13 +441,20 @@ def _apply_runtime_overrides() -> None:
 def main():
     _apply_runtime_overrides()
 
+    from backend.src.core import deploy_env
+
+    safe_print(f"[启动] 部署环境: {deploy_env.describe()}")
+
     instance_manager = None
     
     if sys.platform == "win32":
         from backend.src.utils.single_instance import ensure_single_instance
         from backend.src.utils.paths import get_runtime_instance_name
 
-        is_first, instance_manager = ensure_single_instance(get_runtime_instance_name("Comfyui-Box"))
+        # 锁名默认取当前环境（dev / test / prod 各不相同），
+        # 命令行 --instance-name 仍可覆盖，用于临时再开一个隔离实例。
+        instance_name = get_runtime_instance_name(deploy_env.get_instance_name())
+        is_first, instance_manager = ensure_single_instance(instance_name)
         
         if not is_first:
             safe_print("=" * 60)
@@ -450,10 +481,11 @@ def main():
         level="INFO"
     )
     
-    # 必须在创建任何窗口之前设置，否则任务栏会把窗口归到 python.exe 分组并沿用其图标
+    # 必须在创建任何窗口之前设置，否则任务栏会把窗口归到 python.exe 分组并沿用其图标。
+    # AUMID 按环境区分：同机跑 dev 与 prod 时，任务栏不会把它们合并成一个图标。
     from backend.src.utils.window_icon import set_app_user_model_id
 
-    set_app_user_model_id()
+    set_app_user_model_id(deploy_env.get_app_user_model_id())
 
     migrate_from_internal(logger)
     cleanup_old_updater(logger)
@@ -625,8 +657,8 @@ def main():
     safe_print("=" * 60)
     safe_print(f"[调试] 调试信息:")
     safe_print(f"   sys.frozen: {getattr(sys, 'frozen', False)}")
-    safe_print(f"   SIMULATE_FROZEN: {SIMULATE_FROZEN}")
-    safe_print(f"   运行模式: {'生产环境模拟' if SIMULATE_FROZEN and not getattr(sys, 'frozen', False) else ('生产环境' if getattr(sys, 'frozen', False) else '开发环境')}")
+    safe_print(f"   部署环境: {deploy_env.get_env_name()}")
+    safe_print(f"   实例名(单例锁): {deploy_env.get_instance_name()}")
     safe_print(f"   sys._MEIPASS: {getattr(sys, '_MEIPASS', 'N/A')}")
     safe_print(f"   base_path: {base_path}")
     safe_print(f"   dist_dir: {dist_dir}")
@@ -658,8 +690,21 @@ def main():
         time.sleep(3)
         return
     
-    # 创建并启动自定义HTTP服务器（自动查找可用端口）
-    http_server = create_server(dist_dir, port=None)
+    # 端口是环境身份的一部分：dev 5002 / test 5001 / prod 5000。
+    # 严格模式下被占用就直接报错，避免悄悄漂移到别的端口后日志与实际不符。
+    _port = deploy_env.get_port()
+    try:
+        http_server = create_server(
+            dist_dir,
+            port=_port,
+            strict_port=deploy_env.is_strict_port(),
+        )
+    except RuntimeError as exc:
+        logger.error(f"[HTTP Server] 端口初始化失败: {exc}")
+        safe_print(f"\n[错误] {exc}")
+        _show_fatal_message("Comfyui-Box 启动失败", str(exc))
+        return
+
     http_server.start()
     
     # 轮询确认服务器就绪
@@ -693,7 +738,7 @@ def main():
     safe_print(f"[目录] 前端目录: {dist_dir}")
     safe_print(f"[文件] 入口文件: {index_html}")
     safe_print(f"[地址] 服务器地址: {http_server.get_url()}")
-    safe_print(f"[端口] 使用端口: {http_server.port} (自动分配)")
+    safe_print(f"[端口] 使用端口: {http_server.port} (环境固定)")
     safe_print("=" * 60)
     logger.info("[主窗口] HTTP 服务器就绪，开始创建窗口...")
     
@@ -867,7 +912,9 @@ def main():
     # 创建窗口（连接到自定义HTTP服务器）
     # 注意：pywebview 使用逻辑像素（在 DPI 感知模式下）
     window = webview.create_window(
-        title='Comfyui-Box',
+        # 标题以实例名开头：单实例激活靠 title.startswith(app_name) 匹配，
+        # 换个标题格式会让第二实例找不到已有窗口。
+        title=deploy_env.get_instance_name(),
         url=http_server.get_url(),  # 使用自定义服务器URL
         width=logical_width,
         height=logical_height,

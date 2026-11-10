@@ -266,9 +266,20 @@ def test_cli_runtime_override_keeps_pointer_untouched(tmp_path, monkeypatch):
         assert paths.is_test_mode() is True
         assert pointer_file.read_text(encoding="utf-8") == "ORIGINAL"
 
+        from backend.src.core import deploy_env
         from backend.src.utils.test_isolation import guard_write
 
-        assert guard_write("安装插件") is not None
+        # dev 用 --user-data-dir 起自己的沙箱时要能正常写入，
+        # 不能因为"本次是隔离实例"就把开发环境一起锁死。
+        assert deploy_env.is_write_guard_enabled() is False
+        assert guard_write("安装插件") is None
+
+        # 只有 --test-mode 或 test 环境才拒绝写真实 ComfyUI 根
+        deploy_env.set_write_guard_override(True)
+        try:
+            assert guard_write("安装插件") is not None
+        finally:
+            deploy_env.set_write_guard_override(False)
     finally:
         paths._runtime_user_root = None
         paths._runtime_instance_name = None
