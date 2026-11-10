@@ -22,7 +22,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from fixtures import FixtureError  # noqa: E402
-from fixtures import assistant, comfyui, context, gallery, lora, prompts  # noqa: E402
+from fixtures import assistant, comfyui, context, gallery, lora, prompts, state  # noqa: E402
 
 
 def _cmd_seed(env: str, skip_video: bool) -> int:
@@ -33,6 +33,10 @@ def _cmd_seed(env: str, skip_video: bool) -> int:
     print(f"[seed] 环境 = {env}")
     print(f"[seed] 数据根 = {context.user_root()}")
     print(f"[seed] 产物目录 = {context.fixtures_dir()}")
+
+    state_info = state.seed(manifest)
+    print(f"[seed] 首启状态: 标记{'已建' if state_info['marker_created'] else '已存在'}"
+          f" / settings{'已建' if state_info['settings_created'] else '已存在'}")
 
     comfyui_info = comfyui.seed(manifest)
     print(f"[seed] 假 ComfyUI: {comfyui_info['comfyui_root']} "
