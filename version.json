@@ -1,8 +1,8 @@
 {
-  "version": "V1.0.2",
-  "published_at": "2026-11-11T02:34:00Z",
-  "download_url": "https://github.com/qiqStrong/Comfyui-Box/releases/download/v1.0.2/Comfyui-Box-v1.0.2-win64.zip",
-  "file_size": 155576663,
-  "file_hash": "3004727d5d730b6efc6e21a8ffb86c88f683c7123ff5cb8b1aff8f932a80877d",
-  "release_notes": "# Comfyui-Box V1.0.2 更新日志\n\n**版本类型**：Stable\n\n## 🐛 问题修复\n\n- **修复工作流页白屏**：工作流目录里混入 API 格式（没有 `nodes` 字段）或结构残缺的 JSON 时，节点图转换直接抛 `TypeError`，整个工作流页掉进错误边界。现在对 `nodes` / `links` / `pos` / `size` 统一做兜底，异常文件降级为空图而不是崩页\n- 修复内置节点映射表在全新数据目录下恒为空（改为随包资源 `resource/config/core_nodes.json`，缺失时自动回退）\n- 修复打包前检查因日志告警写入 stderr 而中断构建\n\n## ✨ 主要更新\n\n- **部署环境隔离**：`resource/config/deploy.json` 作为环境真源，端口（dev 5002 / test 5001 / prod 5000）、单实例锁名、任务栏标识、运行数据目录、用户数据指针全部按环境分开；源码默认 dev，打包产物由 `sys.frozen` 强制 prod，prod 的文件名与目录名保持原样，升级零迁移\n- **静态资源统一**：图片、图标、二维码、头像、模型、系统配置收口到 `source-code/resource/`\n- **场景化假数据工具**：`scripts/dev_fixtures.py` 支持 域 / 变体 / 场景 三层模型，可为工作流、资产库、提示词库等分别生成正常、边界、压测、空集数据，仅对 dev / test 生效\n\n## 🛠 工程\n\n- 修复引导弹窗「选择数据保存位置」每次启动重复弹出\n- 修复代理检测弹窗「不再弹出」勾选后仍反复出现（切换数据目录时未继承旧配置）\n- 端口改为严格模式：被占用时直接提示并退出，不再静默换端口\n"
+  "version": "V1.0.3",
+  "published_at": "2026-11-11T04:50:13Z",
+  "download_url": "https://github.com/qiqStrong/Comfyui-Box/releases/download/v1.0.3/Comfyui-Box-v1.0.3-win64.zip",
+  "file_size": 155579029,
+  "file_hash": "536adcb743e7e6b18352fbed7002227a31bb956d14b459383626ca61452573a8",
+  "release_notes": "# Comfyui-Box V1.0.3 更新日志\n\n**版本类型**：Stable\n\n## 🐛 问题修复\n\n- **统一节点数口径**：列表卡片统计的是 JSON 里 `nodes` 数组的长度，详情面板却排除了 `Reroute` / `Note` 等虚拟节点，同一份工作流会出现「卡片 7 节点、详情 5 节点」。现在两边统一按**实际节点**计数（排除虚拟节点），并在详情里注明还有几个虚拟节点未计入\n- **API 格式工作流详情显示 0 节点**：这类文件没有 `nodes` 数组，详情统计恒为 0，与卡片的数字对不上。现在按 `class_type` 条目计数，与卡片保持一致，节点图位置改为提示「API 格式无法绘制节点图」\n- 工作流 JSON 的 `nodes` / `links` 不是数组、或数组里混入非对象记录时，解析直接跳过而不是抛异常\n"
 }
