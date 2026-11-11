@@ -1,8 +1,8 @@
 {
-  "version": "V1.0.1",
-  "published_at": "2026-11-10T16:14:15Z",
-  "download_url": "https://github.com/qiqStrong/Comfyui-Box/releases/download/v1.0.1/Comfyui-Box-v1.0.1-win64.zip",
-  "file_size": 155577577,
-  "file_hash": "bf4fe88d5dbb09c115fd6d092a2ee9af79fe8111819cebdfec49f143b24c64c9",
-  "release_notes": "# Comfyui-Box V1.0.1 更新日志\n\n**版本类型**：Stable\n\n## ✨ 主要更新\n\n- **部署环境隔离**：新增 dev / test / prod 三套环境真源（`resource/config/deploy.json`），端口（5002 / 5001 / 5000）、单实例锁名、任务栏标识、运行数据目录、用户数据指针全部按环境分开；源码运行默认 dev，打包产物由 `sys.frozen` 强制 prod\n- **数据目录按环境独立**：`userdata.location` 拆为 `userdata.location.dev` / `.test` / `.prod`，开发调试不再触碰正在使用的生产数据；prod 文件名与目录名保持原样，升级零迁移\n- **静态资源统一**：图片、图标、二维码、头像、模型、系统配置全部收口到 `source-code/resource/`，删除 `assets/`、`frontend/public/`、`backend/models/` 三处散落目录\n\n## 🐛 问题修复\n\n- 修复引导弹窗「选择数据保存位置」每次启动重复弹出、选择不生效\n- 修复代理检测弹窗「不再弹出」勾选后仍反复出现（切换数据目录时未继承旧配置）\n- 修复内置节点映射表在全新数据目录下恒为空（改为随包资源并补回退）\n- 修复打包前检查因日志告警写入 stderr 而中断构建\n\n## 🛠 工程与发布\n\n- 新增 dev / test 假数据生成器 `scripts/dev_fixtures.py`，可生成、可清理、拒绝写入 prod\n- 端口改为严格模式：被占用时直接提示并退出，不再静默换端口\n- 移除误导性的 `SIMULATE_FROZEN` 开关，是否打包只看 `sys.frozen`\n"
+  "version": "V1.0.2",
+  "published_at": "2026-11-11T02:34:00Z",
+  "download_url": "https://github.com/qiqStrong/Comfyui-Box/releases/download/v1.0.2/Comfyui-Box-v1.0.2-win64.zip",
+  "file_size": 155576663,
+  "file_hash": "3004727d5d730b6efc6e21a8ffb86c88f683c7123ff5cb8b1aff8f932a80877d",
+  "release_notes": "# Comfyui-Box V1.0.2 更新日志\n\n**版本类型**：Stable\n\n## 🐛 问题修复\n\n- **修复工作流页白屏**：工作流目录里混入 API 格式（没有 `nodes` 字段）或结构残缺的 JSON 时，节点图转换直接抛 `TypeError`，整个工作流页掉进错误边界。现在对 `nodes` / `links` / `pos` / `size` 统一做兜底，异常文件降级为空图而不是崩页\n- 修复内置节点映射表在全新数据目录下恒为空（改为随包资源 `resource/config/core_nodes.json`，缺失时自动回退）\n- 修复打包前检查因日志告警写入 stderr 而中断构建\n\n## ✨ 主要更新\n\n- **部署环境隔离**：`resource/config/deploy.json` 作为环境真源，端口（dev 5002 / test 5001 / prod 5000）、单实例锁名、任务栏标识、运行数据目录、用户数据指针全部按环境分开；源码默认 dev，打包产物由 `sys.frozen` 强制 prod，prod 的文件名与目录名保持原样，升级零迁移\n- **静态资源统一**：图片、图标、二维码、头像、模型、系统配置收口到 `source-code/resource/`\n- **场景化假数据工具**：`scripts/dev_fixtures.py` 支持 域 / 变体 / 场景 三层模型，可为工作流、资产库、提示词库等分别生成正常、边界、压测、空集数据，仅对 dev / test 生效\n\n## 🛠 工程\n\n- 修复引导弹窗「选择数据保存位置」每次启动重复弹出\n- 修复代理检测弹窗「不再弹出」勾选后仍反复出现（切换数据目录时未继承旧配置）\n- 端口改为严格模式：被占用时直接提示并退出，不再静默换端口\n"
 }
