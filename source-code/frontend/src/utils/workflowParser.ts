@@ -539,15 +539,22 @@ export function convertToReactFlow(data: WorkflowJsonData): { nodes: Node[]; edg
   const nodes: Node[] = []
   const edges: Edge[] = []
 
-  for (const node of data.nodes) {
+  // 工作流目录里可能混入 API 格式（无 nodes 字段）或结构残缺的文件。
+  // 这里不能假设数组存在，否则整个页面会掉进路由错误边界。
+  const rawNodes = Array.isArray(data?.nodes) ? data.nodes : []
+  const rawLinks = Array.isArray(data?.links) ? data.links : []
+
+  for (const node of rawNodes) {
     const { githubUrl, pluginName } = resolvePluginInfo(node)
 
     const isReroute = node.type === 'Reroute'
-    
+    const position = Array.isArray(node.pos) ? node.pos : [0, 0]
+    const size = Array.isArray(node.size) ? node.size : [200, 80]
+
     nodes.push({
       id: String(node.id),
       type: 'workflowNode',
-      position: { x: node.pos[0], y: node.pos[1] },
+      position: { x: position[0], y: position[1] },
       data: {
         label: node.type,
         nodeType: node.type,
@@ -559,18 +566,18 @@ export function convertToReactFlow(data: WorkflowJsonData): { nodes: Node[]; edg
         isReroute
       },
       style: isReroute ? {
-        width: node.size[0],
-        height: node.size[1],
+        width: size[0],
+        height: size[1],
       } : undefined
     })
   }
 
-  if (data.links) {
-    for (const link of data.links) {
+  if (rawLinks.length) {
+    for (const link of rawLinks) {
       const [id, sourceId, sourceSlot, targetId, targetSlot, linkType] = link
-      
-      const sourceNode = data.nodes.find(n => n.id === sourceId)
-      const targetNode = data.nodes.find(n => n.id === targetId)
+
+      const sourceNode = rawNodes.find(n => n.id === sourceId)
+      const targetNode = rawNodes.find(n => n.id === targetId)
       
       if (!sourceNode || !targetNode) {
         console.warn(`Link ${id}: source node ${sourceId} or target node ${targetId} not found`)
@@ -624,7 +631,10 @@ export function getWorkflowStats(data: WorkflowJsonData) {
   const nodeTypes = new Map<string, number>()
   const plugins = new Map<string, { githubUrl: string; count: number; nodes: string[] }>()
 
-  for (const node of data.nodes) {
+  // 与 convertToReactFlow 保持一致：API 格式或残缺文件没有 nodes 数组
+  const rawNodes = Array.isArray(data?.nodes) ? data.nodes : []
+
+  for (const node of rawNodes) {
     if (isVirtualNode(node.type)) {
       continue
     }
@@ -666,8 +676,8 @@ export function getWorkflowStats(data: WorkflowJsonData) {
   }
 
   return {
-    totalNodes: data.nodes.length,
-    totalLinks: data.links?.length || 0,
+    totalNodes: rawNodes.length,
+    totalLinks: Array.isArray(data?.links) ? data.links.length : 0,
     nodeTypes: Array.from(nodeTypes.entries()).map(([type, count]) => ({ type, count })),
     plugins: Array.from(plugins.entries()).map(([pluginName, info]) => ({
       githubUrl: info.githubUrl,
