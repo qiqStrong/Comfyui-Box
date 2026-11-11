@@ -53,13 +53,13 @@ def test_env_variable_wins_over_config_file(monkeypatch):
     assert deploy_env.get_env_source() == "env_var"
 
 
-def test_frozen_forces_prod_even_with_override(monkeypatch):
-    """打包产物恒为 prod：外部传 --env dev 也不能把 exe 降级成开发态。"""
+def test_frozen_allows_env_override(monkeypatch):
+    """打包后也可以跑 dev/test 用于调试，不再强制判定为 prod。"""
     monkeypatch.setattr(sys, "frozen", True, raising=False)
     deploy_env.set_env_override("dev")
     try:
-        assert deploy_env.get_env_name() == "prod"
-        assert deploy_env.get_env_source() == "frozen"
+        assert deploy_env.get_env_name() == "dev"
+        assert deploy_env.get_env_source() == "cli"
     finally:
         # 显式恢复，避免 fixture teardown 在 frozen 状态下解析 resource 路径
         monkeypatch.setattr(sys, "frozen", False, raising=False)

@@ -1,0 +1,15 @@
+{
+  "_comment": "测试环境差异配置",
+  "http": {
+    "port": 5001
+  },
+  "instance": {
+    "name": "Comfyui-Box-test"
+  },
+  "app_user_model_id": "Comfyui-Box.Desktop.test",
+  "runtime_subdir": "logs",
+  "data_sources": {
+    "test_fixtures": true
+  },
+  "write_guard": true
+}

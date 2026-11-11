@@ -1,0 +1,11 @@
+{
+  "_comment": "生产环境差异配置",
+  "http": {
+    "port": 5000
+  },
+  "instance": {
+    "name": "Comfyui-Box"
+  },
+  "app_user_model_id": "Comfyui-Box.Desktop",
+  "runtime_subdir": ""
+}

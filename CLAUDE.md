@@ -52,15 +52,18 @@ python -m pytest -v -s              # 详细输出
 python -m pytest -k "test_name"     # 运行特定测试
 pytest --cov=src --cov-report=html  # 覆盖率报告
 
-# 运行主应用（默认 dev 环境：端口 5002，数据根 %LOCALAPPDATA%\Comfyui-Box\userdata.dev）
+# 运行主应用（默认 dev 环境：端口 5002）
 # 首次运行或前端改动后，必须先构建前端（产物在 source-code/dist/）
 cd source-code/frontend
 npm run build
 cd ../backend
 python main.py
 
-# 显式指定环境（prod 仅用于排障，打包产物运行时恒为 prod）
+# 显式指定环境（可选：dev / test / prod）
 python main.py --env test
+# 或使用环境变量
+set COMFYUI_BOX_ENV=test
+python main.py
 ```
 
 ### 生产构建
@@ -314,20 +317,22 @@ process_manager.start(python_path, comfyui_path, args=None, env_config=None)  # 
 
 ### 11. 部署环境与数据隔离（调试必读）
 
-三种环境由 `backend/src/core/deploy_env.py` 唯一判定，参数在 `resource/config/deploy.json`（公共段 `defaults` + 环境差异段 `environments`）：
+采用 SpringBoot 风格的多环境配置，由 `backend/src/core/deploy_env.py` 唯一判定：
+- 基础配置：`resource/config/deploy.json`
+- 环境差异：`resource/config/deploy-{env}.json`（dev / test / prod）
 
-| 环境 | 形态 | 端口 | 单实例锁名 | 用户数据指针 | 运行数据 |
-|---|---|---|---|---|---|
-| dev | 源码运行 | 5002 | `Comfyui-Box-dev` | `userdata.location.dev` | `source-code/run/dev` |
-| test | 源码运行，验证待发布代码 | 5001 | `Comfyui-Box-test` | `userdata.location.test` | `source-code/run/test` |
-| prod | 打包 exe | 5000 | `Comfyui-Box` | `userdata.location` | `logs` / `cache` / `webview2`（原位置） |
+| 环境 | 端口 | 单实例锁名 | 用途 | 运行数据 |
+|---|---|---|---|---|
+| dev | 5002 | `Comfyui-Box-dev` | 本地改动，开发自测 | `source-code/logs/`、`source-code/cache/` |
+| test | 5001 | `Comfyui-Box-test` | Git 最新代码，全量测试 | `source-code/logs/`、`source-code/cache/` |
+| prod | 5000 | `Comfyui-Box` | 打包 exe，用户实际使用 | exe 安装目录的 `logs/`、`cache/` |
 
-- **判定优先级**：`sys.frozen` → prod（代码硬兜底，外部传 `--env` 也改不了）＞ `--env` ＞ `COMFYUI_BOX_ENV` ＞ `deploy.json` 的 `current_env` ＞ dev。
-- **端口固定，占用即报错**，不再自动 +1。日志形如 `[端口] 使用端口: 5002 (环境固定)`；被占用时弹原生对话框说明后退出。
-- **prod 的文件名与目录名一字不改**：`userdata.location`、`userdata`、`logs`、`cache`、`webview2` 全部保持历史值，发布版升级后数据零迁移。改这几处前先想清楚会不会让老用户"数据消失"。
-- **数据目录由用户在设置页选**，`deploy.json` 只决定"哪个环境用哪个指针"，**不得写入任何路径字面量**。
-- 启动日志首行给出 `env=dev(config) port=5002 instance=Comfyui-Box-dev ...`，`config` 表示判定来源（另有 `frozen` / `cli` / `env_var` / `default`）。
-- 改完跑 `pytest tests/unit/core/test_deploy_env.py tests/unit/utils/test_paths_userdata.py`。
+- **判定优先级**：`--env` 参数 ＞ `COMFYUI_BOX_ENV` 环境变量 ＞ `deploy.json` 的 `active_env` ＞ dev（默认）
+- **不再根据 sys.frozen 强制判定**：打包后也可以运行 dev/test 环境用于调试
+- **端口固定，占用即报错**，不自动探测空闲端口
+- **数据目录**：用户数据根由用户首次启动选择（保存在 `settings.json`），运行数据（日志/缓存）在项目根下
+- 启动日志首行：`env=dev(config) port=5002 instance=Comfyui-Box-dev ...`
+- 改完跑 `pytest tests/unit/core/test_deploy_env.py`
 
 ### 12. 开发模式运行期事实
 

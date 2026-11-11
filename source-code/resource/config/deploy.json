@@ -1,64 +1,14 @@
 {
-  "_comment_current_env": "源码运行的默认环境。打包产物运行时由 sys.frozen 强制判定为 prod，此值不参与判定。",
-  "current_env": "dev",
-  "defaults": {
-    "http": {
-      "host": "127.0.0.1",
-      "strict_port": true
-    },
-    "instance": {
-      "name": "Comfyui-Box"
-    },
-    "app_user_model_id": "Comfyui-Box.Desktop",
-    "runtime_subdir": "",
-    "data_sources": {
-      "dev_updates": false,
-      "test_fixtures": false
-    },
-    "write_guard": false
+  "_comment": "基础配置（所有环境公共字段）",
+  "active_env": "dev",
+  "http": {
+    "host": "127.0.0.1",
+    "strict_port": true
   },
-  "environments": {
-    "dev": {
-      "http": {
-        "port": 5002
-      },
-      "instance": {
-        "name": "Comfyui-Box-dev"
-      },
-      "app_user_model_id": "Comfyui-Box.Desktop.dev",
-      "runtime_subdir": "run/dev",
-      "data_sources": {
-        "dev_updates": true
-      }
-    },
-    "test": {
-      "http": {
-        "port": 5001
-      },
-      "instance": {
-        "name": "Comfyui-Box-test"
-      },
-      "app_user_model_id": "Comfyui-Box.Desktop.test",
-      "runtime_subdir": "run/test",
-      "data_sources": {
-        "test_fixtures": true
-      },
-      "write_guard": true
-    },
-    "prod": {
-      "http": {
-        "port": 5000
-      },
-      "instance": {
-        "name": "Comfyui-Box"
-      },
-      "app_user_model_id": "Comfyui-Box.Desktop",
-      "runtime_subdir": "",
-      "data_sources": {
-        "dev_updates": false,
-        "test_fixtures": false
-      },
-      "write_guard": false
-    }
-  }
+  "app_user_model_id": "Comfyui-Box.Desktop",
+  "data_sources": {
+    "dev_updates": false,
+    "test_fixtures": false
+  },
+  "write_guard": false
 }

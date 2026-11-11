@@ -1,0 +1,14 @@
+{
+  "_comment": "开发环境差异配置",
+  "http": {
+    "port": 5002
+  },
+  "instance": {
+    "name": "Comfyui-Box-dev"
+  },
+  "app_user_model_id": "Comfyui-Box.Desktop.dev",
+  "runtime_subdir": "logs",
+  "data_sources": {
+    "dev_updates": true
+  }
+}
