@@ -1988,7 +1988,8 @@
       "nodes": "Nodes",
       "links": "Links",
       "types": "Types",
-      "plugins": "Plugins"
+      "plugins": "Plugins",
+      "virtualHint": "{{count}} more virtual nodes (Reroute / Note), not counted"
     },
     "info": {
       "title": "Workflow Info",
@@ -2040,7 +2041,8 @@
       "noDescription": "No description",
       "selectHint": "Select a workflow to see its preview, info, node graph and plugin list here",
       "graph": "Node Graph",
-      "noRawData": "Cannot read the raw data of this workflow"
+      "noRawData": "Cannot read the raw data of this workflow",
+      "apiFormatHint": "This file is in API format: nodes can be counted but no graph can be drawn"
     },
     "viewModes": {
       "list": "Compact List",

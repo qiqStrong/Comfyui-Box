@@ -10,6 +10,8 @@ interface WorkflowStatsProps {
   totalLinks: number
   nodeTypesCount: number
   pluginsCount: number
+  /** 被排除的虚拟节点数（Reroute / Note），用于解释节点图里多出来的方块 */
+  virtualNodes?: number
   className?: string
 }
 
@@ -18,6 +20,7 @@ export function WorkflowStats({
   totalLinks,
   nodeTypesCount,
   pluginsCount,
+  virtualNodes = 0,
   className
 }: WorkflowStatsProps) {
   const { t } = useTranslation()
@@ -30,18 +33,25 @@ export function WorkflowStats({
   ]
 
   return (
-    <div className={cn('grid grid-cols-4 gap-2', className)}>
-      {stats.map((stat) => (
-        <div
-          key={stat.label}
-          className="flex flex-col items-center justify-center rounded border border-border-subtle bg-surface-active p-2"
-        >
-          <div className="mb-1 text-lg font-bold leading-none font-mono text-foreground">
-            {stat.value}
+    <div className={cn('space-y-1.5', className)}>
+      <div className="grid grid-cols-4 gap-2">
+        {stats.map((stat) => (
+          <div
+            key={stat.label}
+            className="flex flex-col items-center justify-center rounded border border-border-subtle bg-surface-active p-2"
+          >
+            <div className="mb-1 text-lg font-bold leading-none font-mono text-foreground">
+              {stat.value}
+            </div>
+            <div className="text-[10px] text-muted-foreground">{stat.label}</div>
           </div>
-          <div className="text-[10px] text-muted-foreground">{stat.label}</div>
-        </div>
-      ))}
+        ))}
+      </div>
+      {virtualNodes > 0 && (
+        <p className="text-[10px] leading-tight text-muted-foreground">
+          {t('workflow.stats.virtualHint', { count: virtualNodes })}
+        </p>
+      )}
     </div>
   )
 }

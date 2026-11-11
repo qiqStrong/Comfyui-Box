@@ -202,6 +202,7 @@ export function WorkflowDetailPanel({
                   totalLinks={stats.totalLinks}
                   nodeTypesCount={stats.nodeTypes.length}
                   pluginsCount={stats.plugins.length}
+                  virtualNodes={stats.virtualNodes}
                 />
               </div>
             )}
@@ -212,11 +213,17 @@ export function WorkflowDetailPanel({
                 {t('workflow.detail.graph')}
               </div>
               <div className="h-[220px]">
-                <WorkflowGraph
-                  data={workflow.rawData}
-                  selectedPluginId={selectedPluginId}
-                  className="size-full"
-                />
+                {stats?.isApiFormat ? (
+                  <div className="flex h-full items-center justify-center rounded-lg border border-dashed border-border-subtle px-4 text-center text-xs leading-relaxed text-muted-foreground">
+                    {t('workflow.detail.apiFormatHint')}
+                  </div>
+                ) : (
+                  <WorkflowGraph
+                    data={workflow.rawData}
+                    selectedPluginId={selectedPluginId}
+                    className="size-full"
+                  />
+                )}
               </div>
             </div>
 

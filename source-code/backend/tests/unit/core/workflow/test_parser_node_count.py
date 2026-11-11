@@ -48,3 +48,26 @@ def test_空字典返回零():
 def test_nodes字段不是列表时回退到class_type计数():
     data = {"nodes": "broken", "1": {"class_type": "KSampler"}}
     assert WorkflowParser.extract_node_count(data) == 1
+
+
+def test_虚拟节点不计入节点数():
+    """列表卡片与详情解析必须同口径：Reroute / Note 不算节点"""
+    data = {
+        "nodes": [
+            {"id": 1, "type": "KSampler"},
+            {"id": 2, "type": "Reroute"},
+            {"id": 3, "type": "Note"},
+            {"id": 4, "type": "VAEDecode"},
+        ],
+        "links": [],
+    }
+    assert WorkflowParser.extract_node_count(data) == 2
+    # 与 parse_data 的结果对齐，避免同一份文件出现两个节点数
+    assert len(WorkflowParser.parse_data(data).nodes) == 2
+
+
+def test_节点记录结构异常时不抛异常():
+    data = {"nodes": ["字符串节点", None, {"id": 1, "type": "KSampler"}], "links": []}
+    # 非字典记录不是节点，忽略；合法记录照常计数
+    assert WorkflowParser.extract_node_count(data) == 1
+    assert len(WorkflowParser.parse_data(data).nodes) == 1

@@ -2090,7 +2090,8 @@
       "nodes": "节点数",
       "links": "连线数",
       "types": "类型",
-      "plugins": "插件"
+      "plugins": "插件",
+      "virtualHint": "另有 {{count}} 个虚拟节点（Reroute / 注释），不计入节点数"
     },
     "info": {
       "title": "工作流信息",
@@ -2142,7 +2143,8 @@
       "noDescription": "暂无描述",
       "selectHint": "选中一个工作流，这里显示它的预览、信息、节点图和插件清单",
       "graph": "节点图",
-      "noRawData": "无法读取该工作流的原始数据"
+      "noRawData": "无法读取该工作流的原始数据",
+      "apiFormatHint": "该文件是 API 格式，只能统计节点数，没有可绘制的节点图"
     },
     "viewModes": {
       "list": "紧凑列表",

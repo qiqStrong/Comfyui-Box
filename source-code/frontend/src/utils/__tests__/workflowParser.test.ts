@@ -8,7 +8,7 @@ import type { WorkflowJsonData } from '@/types/workflow'
  * 这些用例锁死"解析不抛异常"这条底线——一旦抛异常，整个工作流页会掉进路由错误边界。
  */
 describe('workflowParser 对异常结构的容错', () => {
-  it('API 格式（没有 nodes 字段）不抛异常，返回空图', () => {
+  it('API 格式（没有 nodes 字段）不抛异常，画不出图但能统计节点', () => {
     const apiFormat = {
       '3': { class_type: 'KSampler', inputs: { seed: 1 } },
       '4': { class_type: 'VAEDecode', inputs: {} }
@@ -18,7 +18,9 @@ describe('workflowParser 对异常结构的容错', () => {
     expect(convertToReactFlow(apiFormat)).toEqual({ nodes: [], edges: [] })
 
     const stats = getWorkflowStats(apiFormat)
-    expect(stats.totalNodes).toBe(0)
+    // 与后端 extract_node_count 同口径：卡片和详情都显示 2，不能一个 2 一个 0
+    expect(stats.totalNodes).toBe(2)
+    expect(stats.isApiFormat).toBe(true)
     expect(stats.totalLinks).toBe(0)
     expect(stats.plugins).toEqual([])
   })
@@ -47,5 +49,23 @@ describe('workflowParser 对异常结构的容错', () => {
 
     expect(convertToReactFlow(empty)).toEqual({ nodes: [], edges: [] })
     expect(getWorkflowStats(empty)).toMatchObject({ totalNodes: 0, totalLinks: 0 })
+  })
+
+  it('虚拟节点（Reroute / Note）不计入节点数，与列表卡片同口径', () => {
+    const data = {
+      nodes: [
+        { id: 1, type: 'KSampler' },
+        { id: 2, type: 'Reroute' },
+        { id: 3, type: 'Note' },
+        { id: 4, type: 'VAEDecode' }
+      ],
+      links: []
+    } as unknown as WorkflowJsonData
+
+    const stats = getWorkflowStats(data)
+    expect(stats.totalNodes).toBe(2)
+    expect(stats.virtualNodes).toBe(2)
+    // 插件清单的节点数之和必须等于 totalNodes，否则详情面板内部自相矛盾
+    expect(stats.plugins.reduce((sum, p) => sum + p.count, 0)).toBe(2)
   })
 })

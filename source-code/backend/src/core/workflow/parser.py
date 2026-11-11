@@ -110,13 +110,22 @@ class WorkflowParser:
         Returns:
             ParsedWorkflow 对象
         """
-        nodes_data = data.get("nodes", [])
-        links_data = data.get("links", [])
+        # nodes / links 字段结构不合法时按空集处理，与 extract_node_count 的兜底一致
+        nodes_data = data.get("nodes")
+        if not isinstance(nodes_data, list):
+            nodes_data = []
+        links_data = data.get("links")
+        if not isinstance(links_data, list):
+            links_data = []
         
         parsed_nodes = []
         plugin_map: Dict[str, PluginDependency] = {}
         
         for node_data in nodes_data:
+            if not isinstance(node_data, dict):
+                logger.warning(f"跳过结构异常的节点记录: {node_data!r}")
+                continue
+
             node_type = node_data.get("type", "Unknown")
             
             if is_virtual_node(node_type):
@@ -326,9 +335,20 @@ class WorkflowParser:
             return None
 
     @staticmethod
+    def _is_virtual_node_data(node: Any) -> bool:
+        """判断 nodes 数组里的单条记录是否为虚拟节点（非字典记录按普通节点处理）"""
+        if not isinstance(node, dict):
+            return False
+        return is_virtual_node(str(node.get("type") or ""))
+
+    @staticmethod
     def extract_node_count(data: Any) -> int:
         """
         提取节点数量
+
+        计数口径与 parse_data 保持一致：排除 Reroute / Note 等虚拟节点。
+        列表页卡片的节点数必须等于详情页解析出的节点数，否则同一份文件
+        会出现两个不同的数字。
 
         兼容多种顶层结构，避免单个异常文件导致整条加载链路报错：
         - UI 格式：{"nodes": [...], "links": [...], ...}
@@ -338,7 +358,11 @@ class WorkflowParser:
         if isinstance(data, dict):
             nodes = data.get("nodes")
             if isinstance(nodes, list):
-                return len(nodes)
+                return sum(
+                    1 for node in nodes
+                    if isinstance(node, dict)
+                    and not WorkflowParser._is_virtual_node_data(node)
+                )
             # API 格式没有 nodes 字段，按 class_type 条目计数
             return sum(
                 1 for value in data.values()

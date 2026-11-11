@@ -634,10 +634,36 @@ export function getWorkflowStats(data: WorkflowJsonData) {
   // 与 convertToReactFlow 保持一致：API 格式或残缺文件没有 nodes 数组
   const rawNodes = Array.isArray(data?.nodes) ? data.nodes : []
 
+  // 节点数与后端 extract_node_count 同口径：排除 Reroute / Note，
+  // 保证列表卡片和详情面板显示的是同一个数字
+  let totalNodes = 0
+  let virtualNodes = 0
+
+  // API 格式（顶层没有 nodes 数组）画不出节点图，但节点本身是存在的。
+  // 这里同样按 class_type 条目计数，否则会出现"卡片 2 节点、详情 0 节点"。
+  if (!Array.isArray(data?.nodes)) {
+    for (const value of Object.values(data ?? {})) {
+      const classType = (value as { class_type?: unknown } | null)?.class_type
+      if (typeof classType !== 'string') continue
+      totalNodes++
+      nodeTypes.set(classType, (nodeTypes.get(classType) || 0) + 1)
+    }
+    return {
+      totalNodes,
+      virtualNodes: 0,
+      isApiFormat: totalNodes > 0,
+      totalLinks: 0,
+      nodeTypes: Array.from(nodeTypes.entries()).map(([type, count]) => ({ type, count })),
+      plugins: []
+    }
+  }
+
   for (const node of rawNodes) {
     if (isVirtualNode(node.type)) {
+      virtualNodes++
       continue
     }
+    totalNodes++
     
     nodeTypes.set(node.type, (nodeTypes.get(node.type) || 0) + 1)
     
@@ -676,7 +702,9 @@ export function getWorkflowStats(data: WorkflowJsonData) {
   }
 
   return {
-    totalNodes: rawNodes.length,
+    totalNodes,
+    virtualNodes,
+    isApiFormat: false,
     totalLinks: Array.isArray(data?.links) ? data.links.length : 0,
     nodeTypes: Array.from(nodeTypes.entries()).map(([type, count]) => ({ type, count })),
     plugins: Array.from(plugins.entries()).map(([pluginName, info]) => ({
