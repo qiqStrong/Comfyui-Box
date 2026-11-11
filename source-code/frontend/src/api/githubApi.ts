@@ -41,6 +41,8 @@ export async function fetchLocalRelease(): Promise<GitHubRelease | null> {
 }
 
 export async function fetchReleases(): Promise<GitHubRelease[]> {
+  let remote: GitHubRelease[] = []
+
   try {
     const result = await window.pywebview.api.get_github_releases(
       'qiqStrong',
@@ -49,15 +51,30 @@ export async function fetchReleases(): Promise<GitHubRelease[]> {
     )
 
     if (result.success && result.releases) {
-      const releases = result.releases.filter((release: GitHubRelease) => !release.draft)
-      if (releases.length > 0) return releases
+      remote = result.releases.filter((release: GitHubRelease) => !release.draft)
     }
   } catch {
     // 网络异常时继续走本地兜底
   }
 
+  // 仓库里可能只有老版本的 Release（新版本还没发），此时远端列表里没有当前版本，
+  // 直接展示会出现「应用是 V1.0.2、日志却把 V1.0.0 标成最新」。
+  // 这里把随包分发的 version.json 也并进来，按发布时间倒序取前 3 条。
   const local = await fetchLocalRelease()
-  return local ? [local] : []
+  const merged = [...remote]
+  if (local && !merged.some((item) => sameVersion(item.tag_name, local.tag_name))) {
+    merged.push(local)
+  }
+
+  return merged
+    .sort((a, b) => (b.published_at || '').localeCompare(a.published_at || ''))
+    .slice(0, MAX_RELEASES)
+}
+
+/** 版本号比较时忽略大小写与 v 前缀（V1.0.2 / v1.0.2 视为同一个） */
+function sameVersion(a: string, b: string): boolean {
+  const normalize = (value: string) => value.trim().replace(/^v/i, '').toLowerCase()
+  return normalize(a) === normalize(b)
 }
 
 export function parseReleaseBody(body: string): string[] {
