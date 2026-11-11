@@ -344,23 +344,47 @@ process_manager.start(python_path, comfyui_path, args=None, env_config=None)  # 
 - **用户的发布版实例一律不动**：5000 端口、进程名 `Comfyui-Box.exe`。开发实例固定 5002，测试固定 5001，绝不占用 5000。
 - 一次验证只保留**一个**实例；需要换环境时先关旧的再开新的，避免多实例同时写同一份配置。
 
-### 14. dev / test 假数据（`source-code/scripts/dev_fixtures.py`）
+### 14. dev / test 场景化假数据（`source-code/scripts/dev_fixtures.py`）
 
-需要在 dev 或 test 环境验证全部页面时，用这个工具生成可识别的假数据，**不要手工往数据根里塞文件**。
+需要在 dev 或 test 环境验证页面时，用这个工具生成可识别的假数据，**不要手工往数据根里塞文件**。
 
 ```bash
 cd source-code
+backend/.venv/Scripts/python.exe scripts/dev_fixtures.py list                     # 看场景与变体
 backend/.venv/Scripts/python.exe scripts/dev_fixtures.py seed  --env dev
+backend/.venv/Scripts/python.exe scripts/dev_fixtures.py seed  --env dev --scenario edge
+backend/.venv/Scripts/python.exe scripts/dev_fixtures.py seed  --env dev --only workflow --variant workflow=edge
 backend/.venv/Scripts/python.exe scripts/dev_fixtures.py clean --env dev
 backend/.venv/Scripts/python.exe scripts/dev_fixtures.py status --env dev
 ```
 
+**三层模型**（`scripts/fixtures/registry.py`）：
+
+- **域**：一类数据，对应一个 fixture 模块——`state` / `comfyui` / `workflow` / `gallery` / `prompt` / `lora` / `assistant`
+- **变体**：该域的一种完整数据集，统一命名 `basic`（正常）/ `edge`（边界）/ `stress`（大批量）/ `empty`（空集）
+- **场景**：各域变体的组合，一次把环境调成某种验证状态
+
+| 场景 | 用途 |
+| --- | --- |
+| `typical` | 日常开发与全页面走查 |
+| `edge` | 各域边界/脏数据，验证容错与降级 |
+| `stress` | 大批量数据，验证列表性能与布局 |
+| `empty` | 全部空集，验证空状态 |
+| `degraded` | 环境残缺（无 Python、无插件目录），验证异常提示 |
+
+改一个功能就用 `--only <域> --variant <域>=<变体>`，只播种相关的域，信号强、副作用小。
+**边界样本必须对应真实代码分支**，不是凑数量：工作流 `edge` 的每个文件在
+`scripts/fixtures/workflows.py` 顶部都有对照表，写明它覆盖哪条分支。
+
+约束：
+
 - **只支持 dev / test**，`--env prod` 直接抛错，不写入任何字节。
 - 所有产物落在 `<数据根>/fixtures/`，逐条登记在 `.fixture_manifest.json`；`clean` 按清单删除并还原备份。
 - 覆盖既有文件前备份到 `<数据根>/fixtures/backup/`；由 fixture 自己创建的文件不备份（否则 `clean` 会把假数据"还原"回去）。
-- 生成内容：假 ComfyUI 骨架（含本地裸仓库当 `origin`，离线可用）+ 资产库（媒体文件真的放进库目录，靠扫描器建索引）+ 提示词库 + LoRA 索引 + AI 对话。
+- 清单里的 `domains` 段记录每个域上一次的产物，**切换变体时先回收再写入**，不会留下两套数据混杂。
 - **资产库不能只写 `assets.json`**：页面打开时会用 `libraryPath` 重扫磁盘，不在库目录内的资产会被全部删除。
 - 绝不指向真实 ComfyUI 路径，绝不写 prod 指针。
+
 
 ## 测试策略
 

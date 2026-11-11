@@ -184,23 +184,42 @@ resource\
 
 ---
 
-## 六、dev / test 假数据
+## 六、dev / test 场景化假数据
 
 工具：`source-code/scripts/dev_fixtures.py`（仅 dev / test，拒绝 prod）。
 
 ```
-python scripts/dev_fixtures.py seed  --env dev     # 生成
-python scripts/dev_fixtures.py clean --env dev     # 清理并还原
-python scripts/dev_fixtures.py status --env dev    # 查看登记情况
+python scripts/dev_fixtures.py list                                        # 场景与变体目录
+python scripts/dev_fixtures.py seed  --env dev                             # 默认 typical
+python scripts/dev_fixtures.py seed  --env dev --scenario edge             # 全量边界数据
+python scripts/dev_fixtures.py seed  --env dev --only workflow \
+                                    --variant workflow=edge                # 只播种工作流边界
+python scripts/dev_fixtures.py clean --env dev                             # 清理并还原
+python scripts/dev_fixtures.py status --env dev                            # 查看登记情况
 ```
+
+三层模型（`scripts/fixtures/registry.py`）：
+
+| 概念 | 含义 |
+| --- | --- |
+| 域 | 一类数据，一个 fixture 模块：`state` / `comfyui` / `workflow` / `gallery` / `prompt` / `lora` / `assistant` |
+| 变体 | 该域的完整数据集：`basic` / `edge` / `stress` / `empty` |
+| 场景 | 各域变体的组合：`typical` / `edge` / `stress` / `empty` / `degraded` |
+
+改哪个功能就只播种哪个域。边界样本按真实代码分支设计，工作流变体的对照表写在
+`scripts/fixtures/workflows.py` 模块顶部（多插件依赖 / 未知节点 / 虚拟节点 / 空图 /
+大图 / 损坏 JSON / 顶层非对象 / API 格式 / 子图 / 嵌套目录 / 超长文件名）。
 
 产物与约束：
 
 - 所有文件落在 `<数据根>/fixtures/`，`.fixture_manifest.json` 逐条登记。
 - 覆盖既有文件前先备份到 `<数据根>/fixtures/backup/`，`clean` 原样还原；
   由 fixture 自己创建的文件不备份，`clean` 直接删除。
+- 清单 `domains` 段记录每个域上一次的产物，切换变体时先回收再写入，
+  不会出现两套数据混在一起。
 - 假 ComfyUI 是独立目录骨架（`main.py` + `comfy/` + `custom_nodes/` + `models/`
   + `user/default/workflows/`），带一个本地裸仓库当 `origin`，全程离线。
+  `degraded` 变体故意缺 `custom_nodes` 与 git 仓库，用于验证异常提示。
 - 资产库把媒体文件真正放进 `<数据根>/fixtures/library/<分类>/`，由扫描器建索引；
   图片内嵌 `workflow` PNG 文本块，用于验证元数据解析链路。
 - 不写入真实 ComfyUI 路径，不写入 prod 指针。
