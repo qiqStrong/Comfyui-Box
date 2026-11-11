@@ -12,8 +12,15 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Dict, List
 
-from . import context
 from .context import FIXTURE_TAG, Manifest
+
+TITLE = "AI 对话"
+
+VARIANTS = {
+    "basic": "4 个话题 / 13 条消息",
+    "edge": "basic + 空话题 / 50 条长对话 / 4000 字超长单条",
+    "empty": "无对话记录，验证空状态",
+}
 
 # (话题名, [(角色, 内容), ...])
 _TOPICS: List[tuple] = [
@@ -121,8 +128,33 @@ def _insert_topic(connection: sqlite3.Connection, index: int, name: str,
     return len(turns)
 
 
-def seed(manifest: Manifest) -> Dict:
+def _edge_topics() -> List[tuple]:
+    """边界话题：空话题、长对话、超长单条。"""
+    long_dialogue = []
+    for turn in range(25):
+        long_dialogue.append(("user", f"第 {turn + 1} 轮：这个参数该怎么调？"))
+        long_dialogue.append(("assistant", f"第 {turn + 1} 轮回答：建议按场景逐步调整。"))
+
+    huge = "这是一条用于验证消息气泡换行与滚动性能的超长消息。" * 180
+
+    return [
+        (f"{FIXTURE_TAG} 空话题", []),
+        (f"{FIXTURE_TAG} 长对话", long_dialogue),
+        (f"{FIXTURE_TAG} 超长消息", [("user", huge), ("assistant", "收到，已阅读完整内容。")]),
+    ]
+
+
+def seed(manifest: Manifest, variant: str = "basic") -> Dict:
     """写入话题与消息。"""
+    if variant not in VARIANTS:
+        raise ValueError(f"未知 AI 对话变体: {variant}")
+
+    topics: List[tuple] = []
+    if variant != "empty":
+        topics = list(_TOPICS)
+        if variant == "edge":
+            topics += _edge_topics()
+
     db_file = _db_path()
     db_file.parent.mkdir(parents=True, exist_ok=True)
     manifest.backup(db_file)
@@ -133,10 +165,16 @@ def seed(manifest: Manifest) -> Dict:
         _ensure_schema(connection)
         _clear_fixture_rows(connection)
         message_total = 0
-        for index, (name, turns) in enumerate(_TOPICS, start=1):
+        for index, (name, turns) in enumerate(topics, start=1):
             message_total += _insert_topic(connection, index, name, turns)
         connection.commit()
     finally:
         connection.close()
 
-    return {"topics": len(_TOPICS), "messages": message_total, "db": str(db_file)}
+    manifest.set_domain_files("assistant", [db_file])
+    return {
+        "variant": variant,
+        "topics": len(topics),
+        "messages": message_total,
+        "db": str(db_file),
+    }

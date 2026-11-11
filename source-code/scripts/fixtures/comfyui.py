@@ -6,7 +6,6 @@ user/default/workflows/。不包含可执行的推理代码，也不连接任何
 
 from __future__ import annotations
 
-import json
 import shutil
 import subprocess
 from pathlib import Path
@@ -18,6 +17,13 @@ from .context import FIXTURE_TAG, Manifest
 FIXTURE_ENV_ID = "f1c7a000-0000-4000-8000-000000000001"
 FIXTURE_ENV_ALIAS = f"{FIXTURE_TAG} 假 ComfyUI"
 FIXTURE_COMFYUI_VERSION = "0.3.40"
+
+TITLE = "ComfyUI 环境"
+
+VARIANTS = {
+    "base": "完整假安装：main.py / comfy 包 / 3 个插件 / 5 个模型 / 本地 git 仓库",
+    "degraded": "残缺环境：无 python 路径、无 custom_nodes、无 git，验证异常提示",
+}
 
 # 假插件：(目录名, 展示用仓库地址, 是否禁用)
 FAKE_PLUGINS: List[tuple] = [
@@ -91,93 +97,6 @@ def _build_models(root: Path, manifest: Manifest) -> None:
         (root / "models" / sub).mkdir(parents=True, exist_ok=True)
 
 
-def _workflow_payload(title: str, checkpoint: str, prompt: str, steps: int) -> Dict:
-    """构造 UI 格式工作流（节点 + 连线），字段与 ComfyUI 导出保持一致。"""
-    nodes = [
-        {
-            "id": 1,
-            "type": "CheckpointLoaderSimple",
-            "pos": [80, 120],
-            "size": [315, 98],
-            "widgets_values": [checkpoint],
-        },
-        {
-            "id": 2,
-            "type": "CLIPTextEncode",
-            "pos": [440, 60],
-            "size": [420, 160],
-            "widgets_values": [prompt],
-        },
-        {
-            "id": 3,
-            "type": "CLIPTextEncode",
-            "pos": [440, 260],
-            "size": [420, 120],
-            "widgets_values": ["blurry, low quality"],
-        },
-        {
-            "id": 4,
-            "type": "KSampler",
-            "pos": [900, 100],
-            "size": [315, 262],
-            "widgets_values": [156680208700286, "randomize", steps, 7.5, "euler", "normal", 1],
-        },
-        {
-            "id": 5,
-            "type": "VAEDecode",
-            "pos": [1250, 120],
-            "size": [210, 46],
-            "widgets_values": [],
-        },
-        {
-            "id": 6,
-            "type": "SaveImage",
-            "pos": [1500, 120],
-            "size": [315, 270],
-            "widgets_values": [title],
-        },
-    ]
-    links = [
-        [1, 1, 0, 2, 0, "CLIP"],
-        [2, 1, 0, 3, 0, "CLIP"],
-        [3, 1, 0, 4, 0, "MODEL"],
-        [4, 2, 0, 4, 1, "CONDITIONING"],
-        [5, 3, 0, 4, 2, "CONDITIONING"],
-        [6, 1, 2, 5, 0, "VAE"],
-        [7, 4, 0, 5, 1, "LATENT"],
-        [8, 5, 0, 6, 0, "IMAGE"],
-    ]
-    return {
-        "last_node_id": 6,
-        "last_link_id": 8,
-        "nodes": nodes,
-        "links": links,
-        "groups": [],
-        "config": {},
-        "extra": {"ds": {"scale": 0.85, "offset": [40, 60]}},
-        "version": 0.4,
-    }
-
-
-def _build_workflows(root: Path, manifest: Manifest) -> None:
-    workflows = root / "user" / "default" / "workflows"
-    samples = [
-        ("portrait-basic", "fixture-sdxl-base.safetensors",
-         "a cinematic portrait of an astronaut, soft rim light, 50mm", 28),
-        ("landscape-wide", "fixture-sdxl-base.safetensors",
-         "vast mountain valley at sunrise, volumetric fog, ultra wide", 32),
-        ("product-shot", "fixture-sd15.safetensors",
-         "a ceramic mug on a marble table, studio softbox, minimal", 20),
-    ]
-    for name, checkpoint, prompt, steps in samples:
-        payload = _workflow_payload(name, checkpoint, prompt, steps)
-        _write(
-            workflows / f"{name}.json",
-            json.dumps(payload, ensure_ascii=False, indent=2),
-            manifest,
-        )
-
-
 def _init_git_repo(root: Path, manifest: Manifest) -> None:
     """给假安装建一个最小 git 仓库。
 
@@ -218,8 +137,13 @@ def _init_git_repo(root: Path, manifest: Manifest) -> None:
     manifest.record(remote_dir)
 
 
-def build_fake_install(manifest: Manifest) -> Path:
-    """创建假 ComfyUI 目录树，返回其根路径。"""
+def build_fake_install(manifest: Manifest, degraded: bool = False) -> Path:
+    """创建假 ComfyUI 目录树，返回其根路径。
+
+    Args:
+        degraded: 为 True 时故意缺胳膊少腿——不建 custom_nodes、不建 git 仓库，
+            用于验证环境页/依赖页在残缺环境下的提示。
+    """
     root = context.fake_comfyui_dir()
     if root.exists():
         manifest.record(root)
@@ -231,18 +155,20 @@ def build_fake_install(manifest: Manifest) -> Path:
         manifest,
     )
     _write(root / "comfy" / "__init__.py", f'"""假 comfy 包（{FIXTURE_TAG}）。"""\n', manifest)
-    _build_plugins(root, manifest)
+    if not degraded:
+        _build_plugins(root, manifest)
     _build_models(root, manifest)
-    _build_workflows(root, manifest)
     (root / "output").mkdir(parents=True, exist_ok=True)
     (root / "input").mkdir(parents=True, exist_ok=True)
-    _init_git_repo(root, manifest)
+    if not degraded:
+        _init_git_repo(root, manifest)
     return root
 
 
-def _fixture_environment(comfyui_root: Path) -> Dict:
+def _fixture_environment(comfyui_root: Path, degraded: bool = False) -> Dict:
     """构造 environments.json 里的一条环境记录。"""
     python_exe = context.SOURCE_CODE_DIR / "backend" / ".venv" / "Scripts" / "python.exe"
+    has_python = python_exe.exists() and not degraded
     timestamp = context.now_iso()
     return {
         "id": FIXTURE_ENV_ID,
@@ -258,8 +184,8 @@ def _fixture_environment(comfyui_root: Path) -> Dict:
         "config": {
             "general": {
                 "comfyui_path": str(comfyui_root),
-                "python_path": str(python_exe) if python_exe.exists() else "",
-                "pip_path": str(python_exe.parent / "pip.exe") if python_exe.exists() else "",
+                "python_path": str(python_exe) if has_python else "",
+                "pip_path": str(python_exe.parent / "pip.exe") if has_python else "",
                 "git_path": "",
             },
             "acceleration": {
@@ -297,7 +223,8 @@ def _fixture_environment(comfyui_root: Path) -> Dict:
     }
 
 
-def register_environment(manifest: Manifest, comfyui_root: Path) -> Dict:
+def register_environment(manifest: Manifest, comfyui_root: Path,
+                         degraded: bool = False) -> Dict:
     """把假环境写入 environments.json，并设为当前环境。"""
     config_file = context.config_dir() / "environments.json"
     registry = context.read_json(
@@ -309,7 +236,7 @@ def register_environment(manifest: Manifest, comfyui_root: Path) -> Dict:
         item for item in registry.get("environments", [])
         if item.get("id") != FIXTURE_ENV_ID
     ]
-    environments.append(_fixture_environment(comfyui_root))
+    environments.append(_fixture_environment(comfyui_root, degraded=degraded))
 
     registry["environments"] = environments
     registry["current_environment_id"] = FIXTURE_ENV_ID
@@ -320,13 +247,19 @@ def register_environment(manifest: Manifest, comfyui_root: Path) -> Dict:
     return registry
 
 
-def seed(manifest: Manifest) -> Dict:
+def seed(manifest: Manifest, variant: str = "base") -> Dict:
     """入口：建目录 + 注册环境。"""
-    root = build_fake_install(manifest)
-    register_environment(manifest, root)
+    if variant not in VARIANTS:
+        raise ValueError(f"未知 ComfyUI 变体: {variant}")
+
+    degraded = variant == "degraded"
+    root = build_fake_install(manifest, degraded=degraded)
+    register_environment(manifest, root, degraded=degraded)
     return {
+        "variant": variant,
         "comfyui_root": str(root),
         "environment_id": FIXTURE_ENV_ID,
-        "plugins": len(FAKE_PLUGINS),
+        "plugins": 0 if degraded else len(FAKE_PLUGINS),
         "model_files": len(FAKE_MODEL_FILES),
+        "degraded": degraded,
     }

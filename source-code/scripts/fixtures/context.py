@@ -12,7 +12,7 @@ import shutil
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
+from typing import List, Optional
 
 # source-code/ 目录（backend 包的父级），导入后端模块需要它在 sys.path 上
 SOURCE_CODE_DIR = Path(__file__).resolve().parents[2]
@@ -94,7 +94,17 @@ def lora_dir() -> Path:
 
 
 def workflows_dir() -> Path:
+    """工作流元数据目录（<data>/workflows，存 *_metadata.json）。"""
     return data_dir() / "workflows"
+
+
+def comfyui_workflows_dir() -> Path:
+    """假 ComfyUI 的工作流目录，工作流页实际扫描的位置。"""
+    return fake_comfyui_dir() / "user" / "default" / "workflows"
+
+
+def comfyui_models_dir() -> Path:
+    return fake_comfyui_dir() / "models"
 
 
 def fixtures_dir() -> Path:
@@ -127,13 +137,24 @@ class Manifest:
           "env": "dev",
           "created_at": "...",
           "paths": ["<绝对路径>", ...],
-          "backups": {"<原始绝对路径>": "<备份绝对路径>"}
+          "backups": {"<原始绝对路径>": "<备份绝对路径>"},
+          "domains": {"workflow": ["<本次该域创建的绝对路径>", ...]}
         }
+
+    ``domains`` 用于切换场景时精确回收上一个变体的产物——
+    例如从 ``edge`` 换到 ``basic``，边界样本必须消失，否则两种数据混在一起，
+    场景就失去意义了。
     """
 
     def __init__(self, path: Optional[Path] = None):
         self.path = Path(path) if path else manifest_path()
-        self._data = {"env": "", "created_at": now_iso(), "paths": [], "backups": {}}
+        self._data = {
+            "env": "",
+            "created_at": now_iso(),
+            "paths": [],
+            "backups": {},
+            "domains": {},
+        }
 
     def load(self) -> "Manifest":
         if self.path.exists():
@@ -190,6 +211,15 @@ class Manifest:
         self.path.write_text(
             json.dumps(self._data, ensure_ascii=False, indent=2), encoding="utf-8"
         )
+
+    def domain_files(self, domain: str) -> List[str]:
+        """上一次该域创建的文件列表。"""
+        return list(self._data.get("domains", {}).get(domain, []))
+
+    def set_domain_files(self, domain: str, paths) -> None:
+        self._data.setdefault("domains", {})[domain] = [
+            str(Path(item).resolve()) for item in paths
+        ]
 
     def cleanup(self) -> dict:
         """删除登记过的路径，并还原备份。
@@ -252,3 +282,45 @@ def read_json(path: Path, default: Optional[dict] = None) -> dict:
         return json.loads(path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError):
         return dict(default or {})
+
+
+def prune_empty_dirs(root: Path) -> int:
+    """自底向上删除空目录（含 root 自身若为空）。返回删除数量。"""
+    root = Path(root)
+    if not root.exists() or not root.is_dir():
+        return 0
+    removed = 0
+    for directory in sorted(root.rglob("*"), key=lambda p: len(p.parts), reverse=True):
+        if directory.is_dir() and not any(directory.iterdir()):
+            try:
+                directory.rmdir()
+                removed += 1
+            except OSError:
+                pass
+    return removed
+
+
+def reset_domain(manifest: Manifest, domain: str, prune_root: Optional[Path] = None) -> int:
+    """回收该域上一次创建的全部产物，供切换变体时使用。
+
+    Args:
+        manifest: 当前清单。
+        domain: 域名（与 registry 中的 key 一致）。
+        prune_root: 删除文件后顺手清理空目录的根。
+
+    Returns:
+        删除的文件/目录数量。
+    """
+    removed = 0
+    for raw in manifest.domain_files(domain):
+        target = Path(raw)
+        if target.is_dir():
+            shutil.rmtree(target, ignore_errors=True)
+            removed += 1
+        elif target.is_file():
+            target.unlink(missing_ok=True)
+            removed += 1
+    manifest.set_domain_files(domain, [])
+    if prune_root is not None:
+        prune_empty_dirs(prune_root)
+    return removed

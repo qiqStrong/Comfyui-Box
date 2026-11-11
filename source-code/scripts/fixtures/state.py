@@ -13,6 +13,12 @@ from typing import Dict
 from . import context
 from .context import Manifest
 
+TITLE = "首启状态"
+
+VARIANTS = {
+    "base": "写首启标记与 settings.json，关掉引导/代理弹框与关闭确认",
+}
+
 
 def _marker_payload() -> Dict:
     return {
@@ -64,9 +70,12 @@ def _write_settings(manifest: Manifest) -> bool:
     return created
 
 
-def seed(manifest: Manifest) -> Dict:
+def seed(manifest: Manifest, variant: str = "base") -> Dict:
     """补齐首启状态，返回哪些项是本次新建的。"""
+    if variant not in VARIANTS:
+        raise ValueError(f"未知首启状态变体: {variant}")
     return {
+        "variant": variant,
         "marker_created": _write_marker(manifest),
         "settings_created": _write_settings(manifest),
     }
