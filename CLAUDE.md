@@ -2,7 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-> **Last verified**: 2026-11-10（资源目录统一到 `source-code/resource/`、`frontend/public/` 取消、运行数据移出版本控制；其余条目按 2026-11-01 核对结果保留）。文中路径、命令与版本号均以实际命令输出核实；无法用命令验证的性能/体验类描述已标注"未核实"。
+> **Last verified**: 2026-11-13（版本号统一为 V1.0.3、部署环境重构为 SpringBoot 风格、打包脚本修复环境判定；其余条目按 2026-11-01 核对结果保留）。文中路径、命令与版本号均以实际命令输出核实；无法用命令验证的性能/体验类描述已标注"未核实"。
 > 结构/版本类信息以本文件为唯一来源；产品功能介绍以根目录 `README.md` 为唯一来源，`source-code/README.md` 只做源码目录导航。
 
 ## 项目概述
@@ -95,7 +95,13 @@ cd source-code
 > .\.venv\Scripts\python.exe -m pip install pyinstaller
 > ```
 
-版本号唯一来源：`source-code/comfyui_box_version.py`（当前 `__version__ = "V1.0.0"`），缺省回落值 `"V1.0.0"`（`build_scripts/构建工具库.ps1:93-117`）。**不存在名为 `VERSION` 的文件。**
+版本号唯一来源：`source-code/comfyui_box_version.py`（当前 `__version__ = "V1.0.3"`），缺省回落值 `"V1.0.0"`（`build_scripts/构建工具库.ps1:93-117`）。**不存在名为 `VERSION` 的文件。**
+
+**版本号同步**：使用 `source-code/scripts/sync_version.py` 脚本将 `comfyui_box_version.py` 的版本号同步到 `version.json` 和 `frontend/package.json`：
+```bash
+cd source-code
+backend/.venv/Scripts/python.exe scripts/sync_version.py
+```
 
 ## 架构设计
 
