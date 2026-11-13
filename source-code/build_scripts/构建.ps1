@@ -245,16 +245,21 @@ try {
     Write-Step "步骤 5/8: 打包后端"
     
     Push-Location $ProjectRoot
+
+    # 临时修改 deploy.json 的 active_env 为 prod（打包后必须运行在生产环境）
+    $DeployConfigPath = Join-Path $ProjectRoot "resource\config\deploy.json"
+    $OriginalDeployConfig = $null
+
     try {
         Write-Info "激活虚拟环境并运行 PyInstaller..."
-        
+
         # 使用虚拟环境中的 pyinstaller
         $PyInstaller = Join-Path $VenvDir "Scripts\pyinstaller.exe"
-        
+
         if (-not (Test-Path $PyInstaller)) {
             throw "PyInstaller 可执行文件不存在: $PyInstaller"
         }
-        
+
         # 根据 ShowConsole 参数选择 spec 文件
         if ($ShowConsole) {
             $SpecFile = "build_exe_debug.spec"
@@ -263,11 +268,23 @@ try {
             $SpecFile = "build_exe.spec"
             Write-Info "使用生产版本配置 (隐藏控制台窗口)"
         }
-        
+
         # 设置环境变量，让 PyInstaller 输出到指定目录
         $env:DISTPATH = $DistDir
         $env:BUILDPATH = $BuildDir
-        
+
+        # 备份并修改 deploy.json 的 active_env 为 prod
+        $OriginalDeployConfig = Get-Content $DeployConfigPath -Raw -Encoding UTF8
+        try {
+            $DeployConfig = $OriginalDeployConfig | ConvertFrom-Json
+            $DeployConfig.active_env = "prod"
+            $DeployConfig | ConvertTo-Json -Depth 10 | Set-Content $DeployConfigPath -Encoding UTF8 -NoNewline
+            Write-Info "已临时设置 deploy.json 的 active_env 为 prod"
+        } catch {
+            Write-Warning "修改 deploy.json 失败: $_，使用原始配置继续"
+            $OriginalDeployConfig = $null  # 标记为未修改，跳过恢复
+        }
+
         # 运行 PyInstaller
         # PowerShell 会把原生命令写到 stderr 的日志当作错误记录，在 $ErrorActionPreference=Stop 下会误判为构建失败，
         # 因此这里显式合并输出并转发为普通日志，最终只以退出码判断结果
@@ -279,11 +296,11 @@ try {
         } finally {
             $ErrorActionPreference = $PrevErrorAction
         }
-        
+
         if ($PyInstallerExitCode -ne 0) {
             throw "PyInstaller 打包失败"
         }
-        
+
         Write-Success "后端打包完成"
         
         # 检查生成的 exe（onedir 模式下在 Comfyui-Box 子目录中）
@@ -301,6 +318,15 @@ try {
             throw "exe 文件未生成"
         }
     } finally {
+        # 恢复 deploy.json 的原始配置（无论成功失败）
+        if ($null -ne $OriginalDeployConfig) {
+            try {
+                $OriginalDeployConfig | Set-Content $DeployConfigPath -Encoding UTF8 -NoNewline
+                Write-Info "已恢复 deploy.json 的原始配置"
+            } catch {
+                Write-Warning "恢复 deploy.json 失败: $_"
+            }
+        }
         Pop-Location
     }
     
