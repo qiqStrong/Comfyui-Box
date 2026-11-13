@@ -274,15 +274,18 @@ try {
         $env:BUILDPATH = $BuildDir
 
         # 备份并修改 deploy.json 的 active_env 为 prod
-        $OriginalDeployConfig = Get-Content $DeployConfigPath -Raw -Encoding UTF8
+        $OriginalDeployConfigBytes = [IO.File]::ReadAllBytes($DeployConfigPath)
         try {
-            $DeployConfig = $OriginalDeployConfig | ConvertFrom-Json
+            $DeployConfigText = [IO.File]::ReadAllText($DeployConfigPath, [Text.Encoding]::UTF8)
+            $DeployConfig = $DeployConfigText | ConvertFrom-Json
             $DeployConfig.active_env = "prod"
-            $DeployConfig | ConvertTo-Json -Depth 10 | Set-Content $DeployConfigPath -Encoding UTF8 -NoNewline
+            $ModifiedJson = $DeployConfig | ConvertTo-Json -Depth 10
+            # 写入无 BOM 的 UTF-8
+            [IO.File]::WriteAllText($DeployConfigPath, $ModifiedJson, (New-Object System.Text.UTF8Encoding($false)))
             Write-Info "已临时设置 deploy.json 的 active_env 为 prod"
         } catch {
             Write-Warning "修改 deploy.json 失败: $_，使用原始配置继续"
-            $OriginalDeployConfig = $null  # 标记为未修改，跳过恢复
+            $OriginalDeployConfigBytes = $null  # 标记为未修改，跳过恢复
         }
 
         # 运行 PyInstaller
@@ -319,9 +322,9 @@ try {
         }
     } finally {
         # 恢复 deploy.json 的原始配置（无论成功失败）
-        if ($null -ne $OriginalDeployConfig) {
+        if ($null -ne $OriginalDeployConfigBytes) {
             try {
-                $OriginalDeployConfig | Set-Content $DeployConfigPath -Encoding UTF8 -NoNewline
+                [IO.File]::WriteAllBytes($DeployConfigPath, $OriginalDeployConfigBytes)
                 Write-Info "已恢复 deploy.json 的原始配置"
             } catch {
                 Write-Warning "恢复 deploy.json 失败: $_"

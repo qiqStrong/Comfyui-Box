@@ -67,7 +67,8 @@ def _load_json(filename: str, fallback: Optional[Dict] = None) -> Dict[str, Any]
     """读取配置文件，缺失或损坏时返回 fallback"""
     path = _config_dir() / filename
     try:
-        data = json.loads(path.read_text(encoding="utf-8"))
+        # 兼容 BOM：万一打包脚本历史版本写出过带 BOM 的配置，或手工编辑带 BOM
+        data = json.loads(path.read_text(encoding="utf-8-sig"))
         if not isinstance(data, dict):
             logger.warning(f"[部署环境] {path} 顶层不是对象，忽略")
             return fallback or {}
