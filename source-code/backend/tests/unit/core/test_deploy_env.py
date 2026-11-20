@@ -104,6 +104,18 @@ def test_dev_and_test_have_distinct_identity():
     assert len(set(identities)) == 3
 
 
+def test_dev_test_runtime_dirs_are_isolated():
+    """dev/test 的运行数据子目录必须分离，prod 保持安装根原位置。"""
+    subdirs = {}
+    for env in ("dev", "test", "prod"):
+        deploy_env.set_env_override(env)
+        subdirs[env] = deploy_env.get_runtime_subdir()
+    assert subdirs["dev"] == "run/dev"
+    assert subdirs["test"] == "run/test"
+    assert subdirs["prod"] == ""
+    assert subdirs["dev"] != subdirs["test"]
+
+
 def test_test_env_enables_write_guard():
     deploy_env.set_env_override("test")
     assert deploy_env.is_write_guard_enabled() is True
