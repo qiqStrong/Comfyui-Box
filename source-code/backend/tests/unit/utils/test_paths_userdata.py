@@ -6,6 +6,7 @@
 全部通过 monkeypatch 隔离真实环境，不读取进程环境变量。
 """
 
+import shutil
 import sys
 from pathlib import Path
 
@@ -32,6 +33,13 @@ def _isolate_machine_dirs(monkeypatch, tmp_path):
     monkeypatch.setenv("LOCALAPPDATA", str(local))
     monkeypatch.delenv("APPDATA", raising=False)
     monkeypatch.setattr(paths, "get_project_root", lambda: install)
+    # 部署配置必须随临时项目根一起提供，否则 deploy_env 回退到无 runtime_subdir 的兜底值，
+    # 导致路径断言读到空子目录而非真实的 run/<env>。
+    config_dir = _SOURCE_ROOT / "resource" / "config"
+    target_config_dir = install / "resource" / "config"
+    target_config_dir.mkdir(parents=True, exist_ok=True)
+    for name in ("deploy.json", "deploy-dev.json", "deploy-test.json", "deploy-prod.json"):
+        shutil.copy2(config_dir / name, target_config_dir / name)
     deploy_env.set_env_override("dev")
     paths.reset_user_data_root_cache()
     paths.reset_runtime_dir_cache()

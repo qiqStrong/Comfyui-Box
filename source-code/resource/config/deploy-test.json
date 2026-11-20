@@ -7,7 +7,7 @@
     "name": "Comfyui-Box-test"
   },
   "app_user_model_id": "Comfyui-Box.Desktop.test",
-  "runtime_subdir": "logs",
+  "runtime_subdir": "run/test",
   "data_sources": {
     "test_fixtures": true
   },

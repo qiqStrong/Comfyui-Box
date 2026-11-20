@@ -329,8 +329,8 @@ process_manager.start(python_path, comfyui_path, args=None, env_config=None)  # 
 
 | 环境 | 端口 | 单实例锁名 | 用途 | 运行数据 |
 |---|---|---|---|---|
-| dev | 5002 | `Comfyui-Box-dev` | 本地改动，开发自测 | `source-code/logs/`、`source-code/cache/` |
-| test | 5001 | `Comfyui-Box-test` | Git 最新代码，全量测试 | `source-code/logs/`、`source-code/cache/` |
+| dev | 5002 | `Comfyui-Box-dev` | 本地改动，开发自测 | `source-code/run/dev/logs/`、`source-code/run/dev/cache/` |
+| test | 5001 | `Comfyui-Box-test` | Git 最新代码，全量测试 | `source-code/run/test/logs/`、`source-code/run/test/cache/` |
 | prod | 5000 | `Comfyui-Box` | 打包 exe，用户实际使用 | exe 安装目录的 `logs/`、`cache/` |
 
 - **判定优先级**：`--env` 参数 ＞ `COMFYUI_BOX_ENV` 环境变量 ＞ `deploy.json` 的 `active_env` ＞ dev（默认）

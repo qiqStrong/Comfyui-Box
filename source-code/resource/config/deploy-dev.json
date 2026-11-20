@@ -7,7 +7,7 @@
     "name": "Comfyui-Box-dev"
   },
   "app_user_model_id": "Comfyui-Box.Desktop.dev",
-  "runtime_subdir": "logs",
+  "runtime_subdir": "run/dev",
   "data_sources": {
     "dev_updates": true
   }

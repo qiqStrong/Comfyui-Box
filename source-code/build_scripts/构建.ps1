@@ -248,7 +248,6 @@ try {
 
     # 临时修改 deploy.json 的 active_env 为 prod（打包后必须运行在生产环境）
     $DeployConfigPath = Join-Path $ProjectRoot "resource\config\deploy.json"
-    $OriginalDeployConfig = $null
 
     try {
         Write-Info "激活虚拟环境并运行 PyInstaller..."

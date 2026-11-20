@@ -400,7 +400,7 @@ def _apply_runtime_overrides() -> None:
     """
     解析并应用仅本次启动生效的命令行覆盖。
 
-    --env <dev|test|prod>   指定部署环境（打包产物恒为 prod，此参数被忽略）
+    --env <dev|test|prod>   指定部署环境（优先级最高，可覆盖配置文件）
     --user-data-dir <path>  使用测试数据根（不修改机器级 userdata.location 指针）
     --instance-name <name>  使用独立单实例锁名，允许测试实例与发布版并存
     --test-mode             强制开启只读保护（对真实 ComfyUI 根的写操作显式拒绝）
