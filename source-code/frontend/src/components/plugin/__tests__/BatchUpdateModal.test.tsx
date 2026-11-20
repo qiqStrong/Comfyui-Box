@@ -53,17 +53,22 @@ vi.mock('@/components/ui/Loading', () => ({
   ),
 }));
 
-// Mock lucide-react icons
-vi.mock('lucide-react', () => ({
-  CheckCircle2: () => <span data-testid="check-icon" />,
-  XCircle: () => <span data-testid="x-icon" />,
-  Clock: () => <span data-testid="clock-icon" />,
-  RefreshCw: () => <span data-testid="refresh-icon" />,
-  Package: () => <span data-testid="package-icon" />,
-  AlertCircle: () => <span data-testid="alert-icon" />,
-  TrendingUp: () => <span data-testid="trending-icon" />,
-  X: () => <span data-testid="close-icon" />,
-}));
+// Mock lucide-react icons；保留真实导出，仅覆盖带 data-testid 断言的图标
+vi.mock('lucide-react', async (importOriginal) => {
+  const actual = await importOriginal<Record<string, any>>()
+  return {
+    ...actual,
+    CheckCircle2: () => <span data-testid="check-icon" />,
+    XCircle: () => <span data-testid="x-icon" />,
+    Clock: () => <span data-testid="clock-icon" />,
+    RefreshCw: () => <span data-testid="refresh-icon" />,
+    Package: () => <span data-testid="package-icon" />,
+    AlertCircle: () => <span data-testid="alert-icon" />,
+    TrendingUp: () => <span data-testid="trending-icon" />,
+    X: () => <span data-testid="close-icon" />,
+    AlertTriangle: () => <span data-testid="alert-triangle-icon" />,
+  }
+});
 
 describe('BatchUpdateModal', () => {
   // 测试数据

@@ -53,11 +53,16 @@ vi.mock('@/components/ui/Button', () => ({
 }));
 
 // Mock lucide-react icons
-vi.mock('lucide-react', () => ({
-  CheckCircle2: () => <span data-testid="check-icon" />,
-  AlertCircle: () => <span data-testid="alert-icon" />,
-  Package: () => <span data-testid="package-icon" />,
-}));
+vi.mock('lucide-react', async (importOriginal) => {
+  const actual = await importOriginal<Record<string, any>>()
+  return {
+    ...actual,
+    CheckCircle2: () => <span data-testid="check-icon" />,
+    AlertCircle: () => <span data-testid="alert-icon" />,
+    Package: () => <span data-testid="package-icon" />,
+    X: () => <span data-testid="close-icon" />,
+  }
+});
 
 describe('DependencyCard', () => {
   // 默认 mock 返回值

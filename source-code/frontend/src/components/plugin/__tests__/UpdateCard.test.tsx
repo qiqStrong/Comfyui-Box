@@ -53,13 +53,18 @@ vi.mock('@/components/ui/Button', () => ({
 }));
 
 // Mock lucide-react icons
-vi.mock('lucide-react', () => ({
-  CheckCircle2: () => <span data-testid="check-icon" />,
-  AlertCircle: () => <span data-testid="alert-icon" />,
-  GitCommit: () => <span data-testid="git-icon" />,
-  Calendar: () => <span data-testid="calendar-icon" />,
-  Hash: () => <span data-testid="hash-icon" />,
-}));
+vi.mock('lucide-react', async (importOriginal) => {
+  const actual = await importOriginal<Record<string, any>>()
+  return {
+    ...actual,
+    CheckCircle2: () => <span data-testid="check-icon" />,
+    AlertCircle: () => <span data-testid="alert-icon" />,
+    GitCommit: () => <span data-testid="git-icon" />,
+    Calendar: () => <span data-testid="calendar-icon" />,
+    Hash: () => <span data-testid="hash-icon" />,
+    X: () => <span data-testid="close-icon" />,
+  }
+});
 
 describe('UpdateCard', () => {
   // 测试数据

@@ -96,17 +96,24 @@ vi.mock('@/components/ui/alert', () => ({
   AlertDescription: ({ children }: any) => <div>{children}</div>
 }))
 
-// Mock lucide-react 图标
-vi.mock('lucide-react', () => ({
-  RefreshCw: () => <span data-testid="refresh-icon">RefreshCw</span>,
-  Loader2: () => <span data-testid="loader-icon">Loader2</span>,
-  CheckCircle2: () => <span data-testid="check-icon">CheckCircle2</span>,
-  XCircle: () => <span data-testid="x-icon">XCircle</span>,
-  AlertCircle: () => <span data-testid="alert-icon">AlertCircle</span>,
-  Info: () => <span data-testid="info-icon">Info</span>,
-  Search: () => <span data-testid="search-icon">Search</span>,
-  Download: () => <span data-testid="download-icon">Download</span>
-}))
+// Mock lucide-react 图标；保留真实导出，仅覆盖带 data-testid 断言的图标，
+// 避免组件迭代时逐个补齐 mock（未覆盖图标仍为可渲染的 forwardRef 对象）
+vi.mock('lucide-react', async (importOriginal) => {
+  const actual = await importOriginal<Record<string, any>>()
+  return {
+    ...actual,
+    RefreshCw: () => <span data-testid="refresh-icon">RefreshCw</span>,
+    Loader2: () => <span data-testid="loader-icon">Loader2</span>,
+    CheckCircle2: () => <span data-testid="check-icon">CheckCircle2</span>,
+    XCircle: () => <span data-testid="x-icon">XCircle</span>,
+    AlertCircle: () => <span data-testid="alert-icon">AlertCircle</span>,
+    Info: () => <span data-testid="info-icon">Info</span>,
+    Search: () => <span data-testid="search-icon">Search</span>,
+    Download: () => <span data-testid="download-icon">Download</span>,
+    ShoppingCart: () => <span data-testid="shopping-cart-icon">ShoppingCart</span>,
+    ArrowUpDown: () => <span data-testid="arrow-up-down-icon">ArrowUpDown</span>
+  }
+})
 
 // 创建测试用的插件数据
 const createMockPlugin = (index: number, isInstalled = false): Plugin => ({
