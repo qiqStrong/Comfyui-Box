@@ -5,6 +5,14 @@ import { useSettingsStore } from '@/stores/useSettingsStore'
 const CHECK_INTERVAL = 10 * 60 * 1000 // 10 分钟
 const INITIAL_DELAY = 2000 // 启动后 2 秒
 
+/** 一次检查的结果分类：供手动点击按钮做差异化反馈 */
+export type UpdateCheckStatus = 'update' | 'uptodate' | 'error'
+
+export interface UpdateCheckResult {
+  status: UpdateCheckStatus
+  error?: string
+}
+
 export function useAutoUpdateCheck() {
   const { 
     hasUpdate, 
@@ -28,40 +36,54 @@ export function useAutoUpdateCheck() {
     isCheckingRef.current = isChecking
   }, [isChecking])
 
-  const checkForUpdate = useCallback(async () => {
+  const checkForUpdate = useCallback(async (): Promise<UpdateCheckResult> => {
     if (isCheckingRef.current) {
       console.log('[AutoUpdateCheck] 正在检查中，跳过')
-      return
+      return { status: 'error', error: '正在检查中' }
     }
-    
+
     const api = (window as any).pywebview?.api
     if (!api) {
       console.log('[AutoUpdateCheck] API not available')
-      return
+      return { status: 'error', error: 'API not available' }
     }
 
     setChecking(true)
-    
+
     try {
       const result = await api.check_for_update()
-      
-      if (result.success && result.has_update) {
+
+      if (!result?.success) {
+        // 区分「检查失败」与「已是最新」：过去这里把 success:false 当作无更新，
+        // 导致网络不通时静默显示「已是最新版本」，误导用户。
+        const error = result?.error || '无法获取版本信息'
+        console.error('[AutoUpdateCheck] 检查更新失败:', error)
+        setHasUpdate(false, null)
+        return { status: 'error', error }
+      }
+
+      if (result.has_update) {
         setHasUpdate(true, {
           currentVersion: result.current_version,
           latestVersion: result.latest_version,
           downloadUrl: result.download_url,
           releaseNotes: result.release_notes,
           publishedAt: result.published_at,
-          fileSize: result.file_size
+          fileSize: result.file_size,
+          fileHash: result.file_hash
         })
         console.log('[AutoUpdateCheck] 发现新版本:', result.latest_version)
-      } else {
-        setHasUpdate(false, null)
-        console.log('[AutoUpdateCheck] 已是最新版本')
+        return { status: 'update' }
       }
+
+      setHasUpdate(false, null)
+      console.log('[AutoUpdateCheck] 已是最新版本')
+      return { status: 'uptodate' }
     } catch (error) {
+      const message = error instanceof Error ? error.message : String(error)
       console.error('[AutoUpdateCheck] 检查更新失败:', error)
       setHasUpdate(false, null)
+      return { status: 'error', error: message }
     } finally {
       setChecking(false)
     }

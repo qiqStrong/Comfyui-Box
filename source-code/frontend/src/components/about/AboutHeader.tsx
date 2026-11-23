@@ -1,8 +1,10 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Github, ExternalLink } from 'lucide-react'
+import { Github, RefreshCw, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { useAppUpdateStore } from '@/stores/useAppUpdateStore'
+import { useAutoUpdateCheck } from '@/hooks/useAutoUpdateCheck'
+import { toast } from '@/utils/toast'
 import { GITHUB_RELEASES_URL } from '@/api/githubApi'
 
 import { UpdateDialog } from './UpdateDialog'
@@ -16,6 +18,7 @@ export function AboutHeader({ version }: AboutHeaderProps) {
   const [dialogOpen, setDialogOpen] = useState(false)
   const hasAutoOpenedRef = useRef(false)
   const { hasUpdate, hasViewed, markAsViewed } = useAppUpdateStore()
+  const { checkForUpdate, isChecking } = useAutoUpdateCheck()
 
   const showBadge = hasUpdate && !hasViewed
 
@@ -33,10 +36,22 @@ export function AboutHeader({ version }: AboutHeaderProps) {
     }
   }, [hasUpdate, markAsViewed])
 
-  // 本 fork 不发布安装包，本地更新检查没有意义，直接引导到 Releases 页面
-  const handleOpenReleases = useCallback(() => {
-    window.open(GITHUB_RELEASES_URL, '_blank', 'noopener,noreferrer')
-  }, [])
+  // 手动检查更新：走应用内 API。发现更新时 setHasUpdate 会触发上方 effect 自动弹出
+  // UpdateDialog；已是最新/检查失败则给出明确反馈。GitHub 只作为失败时的兜底入口。
+  const handleCheckUpdate = useCallback(async () => {
+    const result = await checkForUpdate()
+    if (result.status === 'uptodate') {
+      toast.success(t('update.noUpdate'))
+    } else if (result.status === 'error') {
+      toast.error(t('update.checkFailed'), {
+        description: result.error || t('update.networkError'),
+        action: {
+          label: t('update.viewOnGitHub'),
+          onClick: () => window.open(GITHUB_RELEASES_URL, '_blank', 'noopener,noreferrer')
+        }
+      })
+    }
+  }, [checkForUpdate, t])
 
   return (
     <>
@@ -71,15 +86,20 @@ export function AboutHeader({ version }: AboutHeaderProps) {
           </div>
         </div>
         <div className="relative">
-          <Button 
-            onClick={handleOpenReleases} 
-            size="sm" 
-            variant="outline" 
+          <Button
+            onClick={handleCheckUpdate}
+            disabled={isChecking}
+            size="sm"
+            variant="outline"
             className="flex items-center gap-2"
-            title={GITHUB_RELEASES_URL}
+            title={t('update.checkUpdate')}
           >
-            <ExternalLink className="w-4 h-4" />
-            {t('update.checkUpdate')}
+            {isChecking ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <RefreshCw className="size-4" />
+            )}
+            {isChecking ? t('update.checking') : t('update.checkUpdate')}
           </Button>
           {showBadge && (
             <span className="absolute -right-1 -top-1 size-2.5 animate-pulse rounded-full border-2 border-background bg-success" />

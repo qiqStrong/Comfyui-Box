@@ -3151,6 +3151,7 @@
     "title": "Software Update",
     "checkUpdate": "Check for Updates",
     "checking": "Checking for updates...",
+    "checkFailed": "Failed to check for updates",
     "noUpdate": "You're up to date",
     "foundUpdate": "New version available",
     "downloading": "Downloading update...",
@@ -3172,6 +3173,7 @@
     "retry": "Retry",
     "pleaseWait": "Please wait...",
     "noReleaseNotes": "No release notes available",
+    "viewOnGitHub": "View on GitHub",
     "closeWarningTitle": "Download In Progress",
     "closeWarningDescription": "Update is being downloaded. You can re-download after closing, but current progress will be lost. Are you sure?"
   },

@@ -130,4 +130,44 @@ describe('useAutoUpdateCheck', () => {
     await advance(INITIAL_DELAY + 100)
     expect(checkForUpdateMock).toHaveBeenCalledTimes(1)
   })
+
+  it('success:false 归类为 error，不误报已是最新版本', async () => {
+    checkForUpdateMock.mockResolvedValue({ success: false, error: '无法获取版本信息' })
+    const { result } = renderHook(() => useAutoUpdateCheck())
+
+    let outcome: Awaited<ReturnType<ReturnType<typeof useAutoUpdateCheck>['checkForUpdate']>> | undefined
+    await act(async () => {
+      outcome = await result.current.checkForUpdate()
+    })
+
+    expect(outcome?.status).toBe('error')
+    expect(outcome?.error).toBe('无法获取版本信息')
+    expect(setHasUpdateMock).toHaveBeenCalledWith(false, null)
+  })
+
+  it('发现更新时归类为 update 并透传 file_hash', async () => {
+    checkForUpdateMock.mockResolvedValue({
+      success: true,
+      has_update: true,
+      current_version: 'V1.0.2',
+      latest_version: 'V1.0.3',
+      download_url: 'https://example.test/app.zip',
+      release_notes: 'notes',
+      published_at: '2026-11-23',
+      file_size: 1024,
+      file_hash: 'abc123'
+    })
+    const { result } = renderHook(() => useAutoUpdateCheck())
+
+    let outcome: Awaited<ReturnType<ReturnType<typeof useAutoUpdateCheck>['checkForUpdate']>> | undefined
+    await act(async () => {
+      outcome = await result.current.checkForUpdate()
+    })
+
+    expect(outcome?.status).toBe('update')
+    expect(setHasUpdateMock).toHaveBeenCalledWith(
+      true,
+      expect.objectContaining({ latestVersion: 'V1.0.3', fileHash: 'abc123' })
+    )
+  })
 })
