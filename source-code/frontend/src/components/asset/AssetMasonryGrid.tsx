@@ -27,16 +27,16 @@ const GAP = 20
 export const AssetMasonryGrid = forwardRef<AssetMasonryGridRef, AssetMasonryGridProps>(
   function AssetMasonryGrid({ onImageClick, onImageDoubleClick, onView, onImageContextMenu }, ref) {
     const { t } = useTranslation()
-    const { 
-      isLoading, 
-      getFilteredAssets, 
-      getGalleryItems,
-      setSelectedCategoryId,
-      clearSelection,
-      setBatchMode,
-      isBatchMode, 
-      thumbnailSize
-    } = useAssetStore()
+    // 逐项 selector 订阅：selectedAssetIds 变化时容器不再重渲染，
+    // 只有卡片自身通过精确订阅响应选中状态
+    const isLoading = useAssetStore((state) => state.isLoading)
+    const getFilteredAssets = useAssetStore((state) => state.getFilteredAssets)
+    const getGalleryItems = useAssetStore((state) => state.getGalleryItems)
+    const setSelectedCategoryId = useAssetStore((state) => state.setSelectedCategoryId)
+    const clearSelection = useAssetStore((state) => state.clearSelection)
+    const setBatchMode = useAssetStore((state) => state.setBatchMode)
+    const isBatchMode = useAssetStore((state) => state.isBatchMode)
+    const thumbnailSize = useAssetStore((state) => state.thumbnailSize)
     const cardRefs = useRef<Map<string, HTMLDivElement>>(new Map())
     const containerRef = useRef<HTMLDivElement>(null)
     const [columnCount, setColumnCount] = useState(4)
@@ -174,10 +174,10 @@ export const AssetMasonryGrid = forwardRef<AssetMasonryGridRef, AssetMasonryGrid
                     key={asset.id}
                     asset={asset}
                     ref={(el) => registerCardRef(asset.id, el)}
-                    onClick={() => onImageClick?.(asset)}
-                    onDoubleClick={() => onImageDoubleClick?.(asset)}
-                    onView={() => onView?.(asset)}
-                    onContextMenu={(e) => onImageContextMenu?.(e, asset)}
+                    onClick={onImageClick}
+                    onDoubleClick={onImageDoubleClick}
+                    onView={onView}
+                    onContextMenu={onImageContextMenu}
                     isBatchMode={isBatchMode}
                   />
                 ))}

@@ -2,10 +2,11 @@
  * 资产卡片组件
  */
 
-import { forwardRef, useState, useCallback, useRef, useEffect } from 'react'
+import { forwardRef, memo, useState, useCallback, useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Copy, Check, Eye, EyeOff, Maximize2, Send } from 'lucide-react'
+import { Copy, Check, Eye, EyeOff, Maximize2, Send, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
+import { ConfirmDialog } from '@/components/common/ConfirmDialog'
 import { useAssetStore } from '@/stores/useAssetStore'
 import { useAssetDragContext } from './AssetDragContext'
 import { useProcessStore } from '@/stores/useProcessStore'
@@ -15,26 +16,35 @@ import { cn } from '@/lib/utils'
 
 interface AssetCardProps {
   asset: Asset
-  onClick?: () => void
-  onDoubleClick?: () => void
+  /** 回调统一接收 asset，便于父容器传稳定函数引用（避免匿名闭包击穿 memo） */
+  onClick?: (asset: Asset) => void
+  onDoubleClick?: (asset: Asset) => void
   /** 显式进入影院模式；不传时仅能用双击触发 */
-  onView?: () => void
-  onContextMenu?: (e: React.MouseEvent) => void
+  onView?: (asset: Asset) => void
+  onContextMenu?: (e: React.MouseEvent, asset: Asset) => void
   isBatchMode?: boolean
   /** masonry：瀑布流，按原图比例撑高；grid：网格，固定方形缩略图 */
   variant?: 'masonry' | 'grid'
 }
 
-export const AssetCard = forwardRef<HTMLDivElement, AssetCardProps>(
-  function AssetCard({ asset, onClick, onDoubleClick, onView, onContextMenu, isBatchMode, variant = 'masonry' }, ref) {
+const AssetCardInner = forwardRef<HTMLDivElement, AssetCardProps>(
+  function AssetCardInner({ asset, onClick, onDoubleClick, onView, onContextMenu, isBatchMode, variant = 'masonry' }, ref) {
     const { t } = useTranslation()
-    const { selectedAssetIds, toggleAssetSelection, updatePreviewBlurred, pushImageToComfyUI } = useAssetStore()
-    const { comfyUIStatus, showWorkspaceIframe } = useProcessStore()
+    // 精确订阅：只取本卡片的选中布尔值，避免 selectedAssetIds 数组变化
+    // 触发所有卡片重渲染（zustand 默认用 Object.is 比较 selector 结果）
+    const isSelected = useAssetStore((state) => state.selectedAssetIds.includes(asset.id))
+    const toggleAssetSelection = useAssetStore((state) => state.toggleAssetSelection)
+    const updatePreviewBlurred = useAssetStore((state) => state.updatePreviewBlurred)
+    const pushImageToComfyUI = useAssetStore((state) => state.pushImageToComfyUI)
+    const deleteAssets = useAssetStore((state) => state.deleteAssets)
+    const comfyUIStatus = useProcessStore((state) => state.comfyUIStatus)
+    const showWorkspaceIframe = useProcessStore((state) => state.showWorkspaceIframe)
     const { success, warning, error } = useToast()
     const [isLoaded, setIsLoaded] = useState(false)
     const [isLocalDragging, setIsLocalDragging] = useState(false)
     const [isPushing, setIsPushing] = useState(false)
-    
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+
     const dragContext = useAssetDragContext()
     const isGlobalDragging = dragContext?.isDragging ?? false
 
@@ -42,7 +52,6 @@ export const AssetCard = forwardRef<HTMLDivElement, AssetCardProps>(
     const isDragTriggeredRef = useRef(false)
     const isMouseDownRef = useRef(false)
 
-    const isSelected = selectedAssetIds.includes(asset.id)
     const isBlurred = asset.previewBlurred ?? false
     const showBlurToggle = true
 
@@ -65,7 +74,7 @@ export const AssetCard = forwardRef<HTMLDivElement, AssetCardProps>(
       if (isBatchMode && !isDragTriggeredRef.current) {
         toggleAssetSelection(asset.id)
       } else if (!isBatchMode) {
-        onClick?.()
+        onClick?.(asset)
       }
     }
 
@@ -125,7 +134,24 @@ export const AssetCard = forwardRef<HTMLDivElement, AssetCardProps>(
 
     const handleView = (e: React.MouseEvent) => {
       e.stopPropagation()
-      onView?.()
+      onView?.(asset)
+    }
+
+    const handleDeleteClick = (e: React.MouseEvent) => {
+      e.stopPropagation()
+      // 批量模式下删除入口由批量工具栏负责，卡片上不显示，避免误删单个
+      if (isBatchMode) return
+      setShowDeleteConfirm(true)
+    }
+
+    const handleDeleteConfirm = async () => {
+      const deleted = await deleteAssets([asset.id])
+      setShowDeleteConfirm(false)
+      if (deleted) {
+        success(t('asset.toast.deleteSuccess'))
+      } else {
+        error(useAssetStore.getState().error || t('asset.error.deleteFailed'))
+      }
     }
 
     const handleMouseDown = useCallback((e: React.MouseEvent) => {
@@ -150,7 +176,10 @@ export const AssetCard = forwardRef<HTMLDivElement, AssetCardProps>(
         if (distance > 5 && !isDragTriggeredRef.current) {
           isDragTriggeredRef.current = true
           setIsLocalDragging(true)
-          dragContext.startDrag(asset.id, selectedAssetIds, moveEvent.clientX, moveEvent.clientY)
+          // 即时读取当前选中集合，而不是订阅整个数组——订阅会让每张卡片
+          // 在任意资产被选中时都重渲染
+          const currentSelection = useAssetStore.getState().selectedAssetIds
+          dragContext.startDrag(asset.id, currentSelection, moveEvent.clientX, moveEvent.clientY)
         }
 
         if (isDragTriggeredRef.current) {
@@ -191,12 +220,13 @@ export const AssetCard = forwardRef<HTMLDivElement, AssetCardProps>(
 
       document.addEventListener('mousemove', handleMouseMove)
       document.addEventListener('mouseup', handleMouseUp)
-    }, [asset.id, selectedAssetIds, dragContext, isBatchMode, isSelected])
+    }, [asset.id, dragContext, isBatchMode, isSelected])
 
     const isVisualDragging = isLocalDragging && isGlobalDragging
     const isGrid = variant === 'grid'
 
     return (
+      <>
       <div
         ref={ref}
         data-asset-card
@@ -211,8 +241,8 @@ export const AssetCard = forwardRef<HTMLDivElement, AssetCardProps>(
           isSelected && 'ring-2 ring-success ring-offset-2 ring-offset-background',
           isVisualDragging && 'opacity-50 scale-[0.98] border-primary ring-2 ring-primary/30'
         )}
-        onDoubleClick={onDoubleClick}
-        onContextMenu={onContextMenu}
+        onDoubleClick={() => onDoubleClick?.(asset)}
+        onContextMenu={(e) => onContextMenu?.(e, asset)}
         onClick={handleClick}
         onMouseDown={handleMouseDown}
       >
@@ -313,6 +343,23 @@ export const AssetCard = forwardRef<HTMLDivElement, AssetCardProps>(
             </Button>
           )}
 
+          {!isBatchMode && (
+            <Button
+              variant="ghost"
+              size="icon"
+              data-testid={`delete-asset-${asset.id}`}
+              onClick={handleDeleteClick}
+              className={cn(
+                'absolute bottom-2 left-1/2 -translate-x-1/2 size-7',
+                'bg-danger/80 backdrop-blur-sm hover:bg-danger',
+                'opacity-0 group-hover:opacity-100 transition-opacity duration-200'
+              )}
+              title={t('asset.contextMenu.delete')}
+            >
+              <Trash2 className="size-4 text-white" />
+            </Button>
+          )}
+
           {isBatchMode && (
             <div
               className={cn(
@@ -331,6 +378,20 @@ export const AssetCard = forwardRef<HTMLDivElement, AssetCardProps>(
           <p className="text-[10px] text-muted-foreground/70">{asset.width}×{asset.height}</p>
         </div>
       </div>
+      <ConfirmDialog
+        open={showDeleteConfirm}
+        onOpenChange={setShowDeleteConfirm}
+        title={t('asset.confirm.deleteTitle')}
+        description={t('asset.confirm.deleteSingleDescription')}
+        confirmText={t('common.delete')}
+        variant="destructive"
+        onConfirm={handleDeleteConfirm}
+      />
+      </>
     )
   }
 )
+
+// memo 化：父容器因其他 state 重渲染时，只要 asset 与回调 props 未变就跳过渲染。
+// 配合上面的 selector 订阅，选中单个资产只会重渲染该卡片。
+export const AssetCard = memo(AssetCardInner)

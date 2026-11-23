@@ -46,15 +46,14 @@ const LABEL_HEIGHT = 34
 export const AssetGridView = forwardRef<AssetMasonryGridRef, AssetGridViewProps>(
   function AssetGridView({ onImageClick, onImageDoubleClick, onView, onImageContextMenu }, ref) {
     const { t } = useTranslation()
-    const {
-      isLoading,
-      getGalleryItems,
-      thumbnailSize,
-      isBatchMode,
-      setSelectedCategoryId,
-      clearSelection,
-      setBatchMode
-    } = useAssetStore()
+    // 逐项 selector 订阅，避免 selectedAssetIds 变化触发整个虚拟网格重算
+    const isLoading = useAssetStore((state) => state.isLoading)
+    const getGalleryItems = useAssetStore((state) => state.getGalleryItems)
+    const thumbnailSize = useAssetStore((state) => state.thumbnailSize)
+    const isBatchMode = useAssetStore((state) => state.isBatchMode)
+    const setSelectedCategoryId = useAssetStore((state) => state.setSelectedCategoryId)
+    const clearSelection = useAssetStore((state) => state.clearSelection)
+    const setBatchMode = useAssetStore((state) => state.setBatchMode)
 
     const cardRefs = useRef<Map<string, HTMLDivElement>>(new Map())
     const gridRef = useGridRef(null)
@@ -145,10 +144,10 @@ export const AssetGridView = forwardRef<AssetMasonryGridRef, AssetGridViewProps>
               asset={asset}
               ref={(el) => cellData.registerCardRef(asset.id, el)}
               isBatchMode={cellData.isBatchMode}
-              onClick={() => cellData.onImageClick?.(asset)}
-              onDoubleClick={() => cellData.onImageDoubleClick?.(asset)}
-              onView={() => cellData.onView?.(asset)}
-              onContextMenu={(e) => cellData.onImageContextMenu?.(e, asset)}
+              onClick={cellData.onImageClick}
+              onDoubleClick={cellData.onImageDoubleClick}
+              onView={cellData.onView}
+              onContextMenu={cellData.onImageContextMenu}
             />
           </div>
         </div>

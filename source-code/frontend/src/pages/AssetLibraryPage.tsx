@@ -57,30 +57,30 @@ interface ContextMenuState {
 
 export default function AssetLibraryPage() {
   const { t } = useTranslation()
-  const {
-    loadData,
-    getFilteredAssets,
-    deleteAssets,
-    selectedAssetIds,
-    clearSelection,
-    toggleBatchMode,
-    isBatchMode,
-    updateAssetInfo,
-    toggleFavorite,
-    moveToCategory,
-    assets,
-    selectedCategoryId,
-    setSelectedCategoryId,
-    setBatchMode,
-    categories,
-    createCategory,
-    updateCategory,
-    moveCategory,
-    deleteCategory,
-    openLocation,
-    incrementalScanLibrary,
-    viewMode
-  } = useAssetStore()
+  // 逐项 selector：selectedAssetIds 变化不再重渲染整个页面（否则会连带重建
+  // 网格容器 props，抵消卡片层的 memo/selector 优化）。批量工具栏等真正依赖
+  // 选中集合的子组件自行订阅。
+  const loadData = useAssetStore((state) => state.loadData)
+  const getFilteredAssets = useAssetStore((state) => state.getFilteredAssets)
+  const deleteAssets = useAssetStore((state) => state.deleteAssets)
+  const clearSelection = useAssetStore((state) => state.clearSelection)
+  const toggleBatchMode = useAssetStore((state) => state.toggleBatchMode)
+  const isBatchMode = useAssetStore((state) => state.isBatchMode)
+  const updateAssetInfo = useAssetStore((state) => state.updateAssetInfo)
+  const toggleFavorite = useAssetStore((state) => state.toggleFavorite)
+  const moveToCategory = useAssetStore((state) => state.moveToCategory)
+  const assets = useAssetStore((state) => state.assets)
+  const selectedCategoryId = useAssetStore((state) => state.selectedCategoryId)
+  const setSelectedCategoryId = useAssetStore((state) => state.setSelectedCategoryId)
+  const setBatchMode = useAssetStore((state) => state.setBatchMode)
+  const categories = useAssetStore((state) => state.categories)
+  const createCategory = useAssetStore((state) => state.createCategory)
+  const updateCategory = useAssetStore((state) => state.updateCategory)
+  const moveCategory = useAssetStore((state) => state.moveCategory)
+  const deleteCategory = useAssetStore((state) => state.deleteCategory)
+  const openLocation = useAssetStore((state) => state.openLocation)
+  const incrementalScanLibrary = useAssetStore((state) => state.incrementalScanLibrary)
+  const viewMode = useAssetStore((state) => state.viewMode)
 
   // 影院模式：只记 id，资产数据始终从 store 派生，改名/评分才能实时反映在舞台上
   const [theaterAssetId, setTheaterAssetId] = useState<string | null>(null)
@@ -363,9 +363,9 @@ export default function AssetLibraryPage() {
   }, [showAllChrome])
 
   const handleBatchDeleteClick = useCallback(() => {
-    setPendingDeleteIds(selectedAssetIds)
+    setPendingDeleteIds(useAssetStore.getState().selectedAssetIds)
     setShowDeleteConfirm(true)
-  }, [selectedAssetIds])
+  }, [])
 
   const handleConfirmDelete = useCallback(async () => {
     if (pendingDeleteIds.length > 0) {
