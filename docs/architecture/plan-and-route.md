@@ -42,7 +42,7 @@
 | config | `vite.config.ts`、`package.json`、`requirements.txt`、`*.spec`、`settings_manager.py` | 已读 |
 | build/CI | `build_scripts/构建.ps1`、`.github/workflows/*` | 已读，含执行分支判定 |
 | 运行时行为 | 本地 Flask test client 探针（CORS 头、路径穿越） | **已实测**，见下 |
-| document | `README.md`（`88bdb15` 确立的单一事实来源）、`CLAUDE.md` | 已读，代码为准 |
+| document | `README.md`（`88bdb15` 确立的单一事实来源）、`AGENTS.md` | 已读，代码为准 |
 
 **探针说明**：安全类主张不采信推断。我用项目自带 venv（`flask 3.1.3` / `werkzeug 3.1.9` / `flask-cors 6.0.5`）复刻了 `http_server.py` 的路由注册方式，在内存临时目录上离线运行，实测出：
 

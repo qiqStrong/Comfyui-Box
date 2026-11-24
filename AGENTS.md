@@ -1,10 +1,8 @@
-# CLAUDE.md
+# AGENTS.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+**本文件是本仓库对 AI 编码代理的强制指令，所有代理在开始任何工作前必须完整读取并遵守。** 结构、版本、命令、约定类信息以本文件为唯一来源，不得凭印象或自行脑补流程替代。产品功能介绍以根目录 `README.md` 为唯一来源，`source-code/README.md` 只做源码目录导航。
 
 > **Last verified**: 2026-11-24（当前发布基线 V1.0.4，含应用内检查更新与资产库悬浮删除/渲染隔离；部署环境重构为 SpringBoot 风格、打包脚本修复环境判定；其余条目按 2026-11-01 核对结果保留）。文中路径、命令与版本号均以实际命令输出核实；无法用命令验证的性能/体验类描述已标注"未核实"。
-> 结构/版本类信息以本文件为唯一来源；产品功能介绍以根目录 `README.md` 为唯一来源，`source-code/README.md` 只做源码目录导航。
-
 ## 项目概述
 
 Comfyui-Box 是一个为 ComfyUI 设计的现代化管理平台（仅支持 Windows），采用 React 19 前端 + Python 后端（pywebview 桌面应用）架构。核心目标是治理和优化 ComfyUI 生态：环境管理、版本控制、插件市场、依赖管理、AI 助手、工作流解析等。
@@ -71,7 +69,7 @@ python main.py
 ```powershell
 # build.ps1 / quick_build.ps1 都位于 source-code/ 目录（仓库根目录没有这两个脚本）
 cd source-code
-.\build.ps1 -Version "1.0.2"
+.\build.ps1 -Version "1.0.4"
 
 # build.ps1 支持的参数（见 source-code/build.ps1 param 块）：
 # -Version       指定版本号，缺省时读 source-code/comfyui_box_version.py 的 __version__
@@ -97,11 +95,27 @@ cd source-code
 
 版本号唯一来源：`source-code/comfyui_box_version.py`（当前 `__version__ = "V1.0.4"`），缺省回落值 `"V1.0.0"`（`build_scripts/构建工具库.ps1:93-117`）。**不存在名为 `VERSION` 的文件。**
 
-**版本号同步**：使用 `source-code/scripts/sync_version.py` 脚本将 `comfyui_box_version.py` 的版本号同步到 `version.json` 和 `frontend/package.json`：
+**版本号同步（发布前强制门禁）**：应用发布版本号散落在 **6 类**载体，发布前必须逐处核对一致，不一致不得打包：
+
+| 载体 | 文件 | 同步方式 |
+|---|---|---|
+| 真源 | `source-code/comfyui_box_version.py` | 手写（唯一事实来源） |
+| 根更新源 | `version.json` | 脚本 + CI 回填发布时间 |
+| 开发态副本 | `source-code/version.json` | 手写 |
+| npm 元数据 | `source-code/frontend/package.json` | 脚本 |
+| 项目指令 | `AGENTS.md`（本文件，2 处） | 手写 |
+| 构建文档 | `source-code/build_scripts/打包说明.md`（2 处） | 手写 |
+
+`source-code/scripts/sync_version.py` **只覆盖 2/6 处**（根 `version.json` + `frontend/package.json`），且会把版本号写成大写 `V...`，与 release tag / CI 的小写 `v...` 约定冲突，需手工改回；该脚本**未被打包/发布流程调用**，只靠手动执行。因此不要以为跑一次脚本就等于全局同步完成。
+
 ```bash
 cd source-code
 backend/.venv/Scripts/python.exe scripts/sync_version.py
+# 之后用 grep 复核全部 6 处一致：
+# grep -rn -I -E "V1\.0\.|v1\.0\." --include="*.py" --include="*.json" --include="*.md" .
 ```
+
+**待补能力**：一个覆盖全部 6 处、统一大小写、支持 `--check` 校验不一致的全局版本同步脚本，并接入打包脚本作为发布前强制门禁。在它落地前，上述人工核对不可跳过（本项目曾因漏改 `package.json` 导致发布后返工）。
 
 ## 架构设计
 

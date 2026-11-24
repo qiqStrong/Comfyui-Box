@@ -1,7 +1,7 @@
 # `source-code/` 目录说明
 
 > 本文件**只做源码目录导航**。产品功能介绍、系统要求和用户 FAQ 的唯一来源是仓库根的 [`README.md`](../README.md)；
-> 架构、命令、约定与调试方法见 [`CLAUDE.md`](../CLAUDE.md)；打包发布见 [`build_scripts/打包说明.md`](build_scripts/打包说明.md)。
+> 架构、命令、约定与调试方法见 [`AGENTS.md`](../AGENTS.md)；打包发布见 [`build_scripts/打包说明.md`](build_scripts/打包说明.md)。
 > 请勿在本文件里复制产品章节（规则见 [`README更新规范.md`](README更新规范.md)）。
 >
 > Last verified: 2026-11-01（本次整改后按 `git ls-files` 与本地实测命令核对；目录清单与测试命令均已复核）
@@ -11,7 +11,7 @@
 | 你想了解 | 去这里 |
 |:---|:---|
 | 这个产品能做什么、怎么装 | `../README.md` |
-| 前后端结构、关键命令、编码约定、调试与日志 | `../CLAUDE.md` |
+| 前后端结构、关键命令、编码约定、调试与日志 | `../AGENTS.md` |
 | 构建 / 发布 exe | `build_scripts/打包说明.md` |
 | README 该怎么写、什么时候该更新 | `README更新规范.md` |
 
@@ -78,4 +78,4 @@ python -m pytest -o addopts="" -q tests/unit     # 仅单元测试
 - **`npm run test` 是 watch 模式**，一次性验证请用 `npm run test:run`。
 - **全量打包脚本要求 `source-code/.venv`**，与开发用的 `source-code/backend/.venv` 不是同一个目录，详见 `build_scripts/打包说明.md` 的"注意事项"。
 - **应用自动更新默认关闭**（`backend/src/core/settings_manager.py` 的 `general.autoUpdate = false`），开关位于「系统设置 → 通用 → 启动时检查更新」。关闭时启动不检查、也不做 10 分钟轮询；开启后启动约 2 秒检查一次，之后每 10 分钟轮询。
-- 构建产物（`dist/`、`build/`、`backend/{build,dist}/`、`frontend/coverage/`、`frontend/tsconfig.tsbuildinfo`）**不纳入版本控制**，规则见 `../CLAUDE.md` 第 7 节。
+- 构建产物（`dist/`、`build/`、`backend/{build,dist}/`、`frontend/coverage/`、`frontend/tsconfig.tsbuildinfo`）**不纳入版本控制**，规则见 `../AGENTS.md` 第 7 节。
