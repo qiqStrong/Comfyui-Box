@@ -2,7 +2,7 @@
   "version": "v1.0.4",
   "published_at": "2026-11-24T01:14:42Z",
   "download_url": "https://github.com/qiqStrong/Comfyui-Box/releases/download/v1.0.4/Comfyui-Box-v1.0.4-win64.zip",
-  "file_size": 0,
-  "file_hash": "",
+  "file_size": 155584518,
+  "file_hash": "f6036c3ba2363f57163861baff19b3a5a64d9e93ea2caca8ffaffe7819808a4c",
   "release_notes": "## V1.0.4\n\n- 检查更新改为应用内检查：点击后在应用内请求版本信息，有更新弹窗提示、已是最新给 Toast、网络失败提供「前往 GitHub」兜底，不再直接跳转外部链接\n- 检查更新结果结构化：正确区分「有更新 / 已是最新 / 检查失败」，修复 success:false 被误判为已是最新\n- 资产库支持悬浮删除按钮，鼠标移到卡片即可单张删除（批量管理模式下隐藏）\n- 资产库渲染隔离：卡片改用精确 selector + memo，点选单个资产不再触发全部卡片重渲染"
 }
