@@ -1,8 +1,8 @@
 {
-  "version": "v1.0.3",
-  "published_at": "2026-11-20T10:00:44Z",
-  "download_url": "https://github.com/qiqStrong/Comfyui-Box/releases/download/v1.0.3/Comfyui-Box-v1.0.3-win64.zip",
-  "file_size": 155583963,
-  "file_hash": "7741a24a81fa7b7584ec87792430996b6a4400eec43cdf6d341bddde176a9fb3",
-  "release_notes": "## V1.0.3\n\n- 修复打包脚本 UTF-8 BOM 导致 exe 回退 dev 环境的问题\n- dev/test/prod 三环境运行数据目录完全隔离（run/dev、run/test、安装根）\n- 部署环境判定重构为 SpringBoot 风格多环境配置\n- 修正 --env 帮助文本与构建脚本遗留变量"
+  "version": "v1.0.4",
+  "published_at": "2026-11-24T01:14:42Z",
+  "download_url": "https://github.com/qiqStrong/Comfyui-Box/releases/download/v1.0.4/Comfyui-Box-v1.0.4-win64.zip",
+  "file_size": 0,
+  "file_hash": "",
+  "release_notes": "## V1.0.4\n\n- 检查更新改为应用内检查：点击后在应用内请求版本信息，有更新弹窗提示、已是最新给 Toast、网络失败提供「前往 GitHub」兜底，不再直接跳转外部链接\n- 检查更新结果结构化：正确区分「有更新 / 已是最新 / 检查失败」，修复 success:false 被误判为已是最新\n- 资产库支持悬浮删除按钮，鼠标移到卡片即可单张删除（批量管理模式下隐藏）\n- 资产库渲染隔离：卡片改用精确 selector + memo，点选单个资产不再触发全部卡片重渲染"
 }

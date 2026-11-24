@@ -1,8 +1,8 @@
 {
-  "version": "V1.0.2",
-  "published_at": "2026-11-11T02:34:00Z",
-  "download_url": "https://github.com/qiqStrong/Comfyui-Box/releases/download/v1.0.2/Comfyui-Box-v1.0.2-win64.zip",
-  "file_size": 155576663,
-  "file_hash": "3004727d5d730b6efc6e21a8ffb86c88f683c7123ff5cb8b1aff8f932a80877d",
-  "release_notes": "# Comfyui-Box V1.0.2 更新日志\n\n**版本类型**：Stable\n\n## 🐛 问题修复\n\n- **修复工作流页白屏**：工作流目录里混入 API 格式（没有 `nodes` 字段）或结构残缺的 JSON 时，节点图转换直接抛 `TypeError`，整个工作流页掉进错误边界。现在对 `nodes` / `links` / `pos` / `size` 统一做兜底，异常文件降级为空图而不是崩页\n- 修复内置节点映射表在全新数据目录下恒为空（改为随包资源 `resource/config/core_nodes.json`，缺失时自动回退）\n- 修复打包前检查因日志告警写入 stderr 而中断构建\n\n## ✨ 主要更新\n\n- **部署环境隔离**：`resource/config/deploy.json` 作为环境真源，端口（dev 5002 / test 5001 / prod 5000）、单实例锁名、任务栏标识、运行数据目录、用户数据指针全部按环境分开；源码默认 dev，打包产物由 `sys.frozen` 强制 prod，prod 的文件名与目录名保持原样，升级零迁移\n- **静态资源统一**：图片、图标、二维码、头像、模型、系统配置收口到 `source-code/resource/`\n- **场景化假数据工具**：`scripts/dev_fixtures.py` 支持 域 / 变体 / 场景 三层模型，可为工作流、资产库、提示词库等分别生成正常、边界、压测、空集数据，仅对 dev / test 生效\n\n## 🛠 工程\n\n- 修复引导弹窗「选择数据保存位置」每次启动重复弹出\n- 修复代理检测弹窗「不再弹出」勾选后仍反复出现（切换数据目录时未继承旧配置）\n- 端口改为严格模式：被占用时直接提示并退出，不再静默换端口\n"
+  "version": "V1.0.4",
+  "published_at": "2026-11-24T01:14:42Z",
+  "download_url": "https://github.com/qiqStrong/Comfyui-Box/releases/download/v1.0.4/Comfyui-Box-v1.0.4-win64.zip",
+  "file_size": 0,
+  "file_hash": "",
+  "release_notes": "## V1.0.4\n\n- 检查更新改为应用内检查：点击后在应用内请求版本信息，有更新弹窗提示、已是最新给 Toast、网络失败提供「前往 GitHub」兜底，不再直接跳转外部链接\n- 检查更新结果结构化：正确区分「有更新 / 已是最新 / 检查失败」，修复 success:false 被误判为已是最新\n- 资产库支持悬浮删除按钮，鼠标移到卡片即可单张删除（批量管理模式下隐藏）\n- 资产库渲染隔离：卡片改用精确 selector + memo，点选单个资产不再触发全部卡片重渲染"
 }
